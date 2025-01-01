@@ -99,9 +99,8 @@ function randomizeTileList(grid: Tile[]) {
 function generateNewTileList(
     gridWidth: number,
     gridHeight: number,
-    seed?: string
 ): Tile[] {
-    const cornerColors = generateCornerColors(seed);
+    const cornerColors = generateCornerColors();
 
     let colorGrid = generateGradientGrid(cornerColors, gridWidth, gridHeight);
 
@@ -119,7 +118,7 @@ function generateNewTileList(
     return tileList;
 }
 
-function generateCornerColors(seed?: string): Array<string> {
+function generateCornerColors(): Array<string> {
     let suitableColors = false;
     let cornerColors: Array<string> = new Array<string>(4);
 
