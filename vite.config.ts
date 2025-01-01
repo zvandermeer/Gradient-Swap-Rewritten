@@ -12,7 +12,7 @@ export default defineConfig({
                 "icons/favicon.ico",
                 "icons/apple-touch-icon.png",
             ],
-            registerType: "prompt",
+            registerType: "autoUpdate",
             manifest: {
                 name: "Color Swap!",
                 short_name: "Color Swap!",
