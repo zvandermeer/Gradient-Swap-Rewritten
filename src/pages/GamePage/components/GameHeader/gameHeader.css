@@ -1,0 +1,59 @@
+#controls {
+    margin: 10px;
+    display: flex;
+    width: 90%;
+}
+
+@media (min-width: 600px) {
+    #controls {
+        width: 600px;
+    }
+}
+
+#controls button {
+    font-size: 20px;
+    height: 50px;
+    width: 50px;
+    border-radius: 10px;
+    margin-right: 7px;
+}
+
+#header-buttons {
+    flex-shrink: 0;
+}
+
+#header-stats {
+    flex-grow: 1;
+    position: relative;
+}
+
+#header-stats div {
+    position: absolute;
+    text-align: center;
+    font-size: 20px;
+    transform: translateY(50%);
+}
+
+@media (min-width: 600px) {
+    #header-stats div {
+        left: 60%;
+    }
+}
+
+@media (max-width: 599px) {
+    #header-stats div {
+        right: 0%;
+        bottom: 50%;
+        width: 8ch;
+    }
+}
+@media (min-width: 600px) {
+    #header-stats div > span {
+        padding-left: 20px;
+    }
+}
+@media (max-width: 599px) {
+    #header-stats div > span {
+        display: block;
+    }
+}

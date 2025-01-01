@@ -1,0 +1,54 @@
+html {
+    height: 100%;
+}
+
+body {
+    background-color: #fff9e7;
+    font-family: "Montserrat Variable", sans-serif;
+    min-height: 100%;
+    touch-action: none;
+    overflow: hidden;
+}
+
+.button {
+    background-color: #04aa6d; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 30%;
+    font-family: "Montserrat Variable", sans-serif;
+    font-weight: normal;
+    padding: 0%;
+}
+
+.fade-in {
+    animation: fade-in .5s ease;
+    opacity: 1;
+}
+
+.fade-out {
+    animation: fade-out .5s ease;
+    opacity: 0;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
