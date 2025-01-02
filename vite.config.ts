@@ -8,10 +8,10 @@ export default defineConfig({
         react(),
         VitePWA({
             includeAssets: [
-                "/fonts/Montserrat-VariableFont_wght.ttf",
-                "icons/favicon.ico",
-                "icons/apple-touch-icon.png",
-                "splash_screens/*.png",
+                "/src/assets/fonts/Montserrat-VariableFont_wght.ttf",
+                "/src/assets/icons/favicon.ico",
+                "/src/assets/icons/apple-touch-icon.png",
+                "/src/assets/splash_screens/*.png",
             ],
             registerType: "autoUpdate",
             manifest: {
@@ -26,16 +26,28 @@ export default defineConfig({
                 display: "standalone",
                 icons: [
                     {
-                        src: "/icons/pwa-192x192.png",
+                        src: "/src/assets/icons/pwa-192x192.png",
                         sizes: "192x192",
                         type: "image/png",
                         purpose: "any",
                     },
                     {
-                        src: "/icons/pwa-512x512.png",
+                        src: "/src/assets/icons/pwa-512x512.png",
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any",
+                    },
+                    {
+                        src: "/src/assets/icons/pwa-maskable-192x192.png",
+                        sizes: "192x192",
+                        type: "image/png",
+                        purpose: "maskable",
+                    },
+                    {
+                        src: "/src/assets/icons/pwa-maskable-512x512.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                        purpose: "maskable",
                     },
                 ],
             },
