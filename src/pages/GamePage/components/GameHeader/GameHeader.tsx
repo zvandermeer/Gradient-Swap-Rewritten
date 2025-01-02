@@ -3,6 +3,8 @@ import "./gameHeader.css";
 import { newLevel, randomizeTiles } from "../../generation";
 import { setOverlayVisible } from "../../gameSlice";
 import { sleep } from "../../../../helpers";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRotateRight, faBars } from '@fortawesome/free-solid-svg-icons'
 
 function GameHeader() {
     const dispatch = useAppDispatch();
@@ -27,7 +29,7 @@ function GameHeader() {
                         dispatch(setOverlayVisible(true));
                     }}
                 >
-                    <i className="bi bi-list"></i>
+                    <FontAwesomeIcon icon={faBars} />
                 </button>
                 <button
                     onClick={async () => {
@@ -40,7 +42,7 @@ function GameHeader() {
                     id="header-restart"
                     className="button"
                 >
-                    <i className="bi bi-arrow-clockwise"></i>
+                    <FontAwesomeIcon icon={faArrowRotateRight} />
                 </button>
             </div>
             <div id="header-stats">

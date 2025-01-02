@@ -1,7 +1,6 @@
 import Grid from "./components/Grid/Grid";
 import GameHeader from "./components/GameHeader/GameHeader";
 import "./gamePage.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect, useState } from "react";
 import { sleep } from "../../helpers";
 import { randomizeTiles } from "./generation";
