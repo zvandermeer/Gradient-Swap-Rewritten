@@ -7,12 +7,9 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            includeAssets: [
-                "/src/assets/fonts/Montserrat-VariableFont_wght.ttf",
-                "/src/assets/icons/favicon.ico",
-                "/src/assets/icons/apple-touch-icon.png",
-                "/src/assets/splash_screens/*.png",
-            ],
+            workbox: {
+                globPatterns: ["**/*.{js,css,html,woff,woff2,ttf,ico,png}"],
+            },
             registerType: "autoUpdate",
             manifest: {
                 name: "Color Swap!",
