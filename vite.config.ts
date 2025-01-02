@@ -11,6 +11,7 @@ export default defineConfig({
                 "/fonts/Montserrat-VariableFont_wght.ttf",
                 "icons/favicon.ico",
                 "icons/apple-touch-icon.png",
+                "iosPWASplash.js",
             ],
             registerType: "autoUpdate",
             manifest: {
