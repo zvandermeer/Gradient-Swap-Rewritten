@@ -45,7 +45,11 @@ function GamePage() {
                         <GameHeader />
                         <Grid />
                     </div>
-                    <PauseOverlay setPageTransition={(state: string) => {setPageTransition(state)}} />
+                    <PauseOverlay
+                        setPageTransition={(state: string) => {
+                            setPageTransition(state);
+                        }}
+                    />
                 </>
             )}
         </>

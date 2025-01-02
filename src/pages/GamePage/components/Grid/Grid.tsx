@@ -20,7 +20,7 @@ export type GridLayout = {
     rows: number;
     columns: number;
     tiles: Tile[];
-}
+};
 
 export type Tile = {
     tileColor: string;
@@ -35,7 +35,8 @@ function evaluateGrid(
 ): boolean {
     for (var i = 0; i < solvedGridLayout.length; i++) {
         if (
-            !solvedGridLayout[i].fixed && solvedGridLayout[i].tileColor !== internalGridLayout[i]
+            !solvedGridLayout[i].fixed &&
+            solvedGridLayout[i].tileColor !== internalGridLayout[i]
         ) {
             return false;
         }
@@ -47,10 +48,14 @@ function evaluateGrid(
 function Grid() {
     const dispatch = useAppDispatch();
 
-    const gridTransition = useAppSelector((state) => state.grid.value.gridTransition);
+    const gridTransition = useAppSelector(
+        (state) => state.grid.value.gridTransition
+    );
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const tileTransition = useAppSelector((state) => state.grid.value.tileTransition);
+    const tileTransition = useAppSelector(
+        (state) => state.grid.value.tileTransition
+    );
     const originalLayout = useAppSelector(
         (state) => state.grid.value.originalLayout
     );
@@ -89,14 +94,16 @@ function Grid() {
                 dispatch(incrementGameSwaps());
             });
             swapyRef.current.onSwapEnd(async () => {
-                const slotMap = swapyRef.current?.slotItemMap().asObject
+                const slotMap = swapyRef.current?.slotItemMap().asObject;
 
-                const internalLayout = [] as string[]
+                const internalLayout = [] as string[];
 
-                if(slotMap) {
-                    Object.keys(slotMap).map((key) => internalLayout[parseInt(key)] = slotMap[key])
+                if (slotMap) {
+                    Object.keys(slotMap).map(
+                        (key) => (internalLayout[parseInt(key)] = slotMap[key])
+                    );
                 }
-                
+
                 if (evaluateGrid(solvedGrid, internalLayout)) {
                     dispatch(setHeaderButtonsEnabled(false));
                     dispatch(setGameFinished(true));
@@ -154,8 +161,7 @@ function Grid() {
                                             key={`swapPreventionDiv${index}`}
                                             data-swapy-no-drag
                                             style={{
-                                                backgroundColor:
-                                                    i.tileColor,
+                                                backgroundColor: i.tileColor,
                                                 width: tileWidth,
                                                 height: tileHeight,
                                             }}

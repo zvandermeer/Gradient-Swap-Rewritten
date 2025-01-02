@@ -3,8 +3,8 @@ import "./gameHeader.css";
 import { newLevel, randomizeTiles } from "../../generation";
 import { setOverlayVisible } from "../../gameSlice";
 import { sleep } from "../../../../helpers";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRotateRight, faBars } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
 
 function GameHeader() {
     const dispatch = useAppDispatch();
@@ -34,7 +34,12 @@ function GameHeader() {
                 <button
                     onClick={async () => {
                         if (headerButtonsEnabled) {
-                            let solvedGrid = await newLevel(dispatch, rows, columns, true);
+                            let solvedGrid = await newLevel(
+                                dispatch,
+                                rows,
+                                columns,
+                                true
+                            );
                             await sleep(1300);
                             randomizeTiles(dispatch, solvedGrid);
                         }

@@ -20,12 +20,12 @@ export const gridSlice = createSlice({
             state.value.gridTransition = action.payload;
         },
         setGridRows: (state, action: PayloadAction<number>) => {
-            if(action.payload >= 3) {
+            if (action.payload >= 3) {
                 state.value.rows = action.payload;
             }
         },
         setGridColumns: (state, action: PayloadAction<number>) => {
-            if(action.payload >= 3) {
+            if (action.payload >= 3) {
                 state.value.columns = action.payload;
             }
         },

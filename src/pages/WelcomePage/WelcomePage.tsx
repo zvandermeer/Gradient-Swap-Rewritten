@@ -9,8 +9,8 @@ import { useEffect, useState } from "react";
 import { newLevel } from "../GamePage/generation";
 import { sleep } from "../../helpers";
 import { setGameLoaded } from "../GamePage/gameSlice";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
 function WelcomePage() {
     let navigate = useNavigate();
@@ -20,14 +20,14 @@ function WelcomePage() {
     const columns = useAppSelector((state) => state.grid.value.columns);
     const gameLoaded = useAppSelector((state) => state.game.value.loaded);
 
-    const [pageTransition, setPageTransition] = useState(""); 
+    const [pageTransition, setPageTransition] = useState("");
 
     useEffect(() => {
-        if(gameLoaded) {
+        if (gameLoaded) {
             dispatch(setGameLoaded(false));
             setPageTransition("fade-in");
         }
-    }, [])
+    }, []);
 
     return (
         <div id="welcome-screen" className={pageTransition}>
@@ -73,15 +73,18 @@ function WelcomePage() {
                     </button>
                 </div>
             </div>
-            <button className="button create-button" onClick={async () => {
-                newLevel(dispatch, rows, columns, false);
+            <button
+                className="button create-button"
+                onClick={async () => {
+                    newLevel(dispatch, rows, columns, false);
 
-                setPageTransition("fade-out");
+                    setPageTransition("fade-out");
 
-                await sleep(500);
+                    await sleep(500);
 
-                navigate("game");
-            }}>
+                    navigate("game");
+                }}
+            >
                 Generate grid!
             </button>
         </div>

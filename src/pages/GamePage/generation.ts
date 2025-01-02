@@ -21,7 +21,7 @@ export async function newLevel(
     rows: number,
     columns: number,
     regenerate: boolean
-) : Promise<GridLayout> {
+): Promise<GridLayout> {
     dispatch(setGameFinished(false));
     dispatch(setGameWon(false));
     dispatch(setGridSwappable(false));
@@ -49,10 +49,13 @@ export async function newLevel(
         dispatch(setGridTransition("fade-in"));
     }
 
-    return(solvedGrid);
+    return solvedGrid;
 }
 
-export async function randomizeTiles(dispatch: AppDispatch, solvedGrid: GridLayout) {
+export async function randomizeTiles(
+    dispatch: AppDispatch,
+    solvedGrid: GridLayout
+) {
     dispatch(setTileTransition("shrink"));
 
     await sleep(800);
@@ -96,10 +99,7 @@ function randomizeTileList(grid: Tile[]) {
     return randomGrid;
 }
 
-function generateNewTileList(
-    gridWidth: number,
-    gridHeight: number,
-): Tile[] {
+function generateNewTileList(gridWidth: number, gridHeight: number): Tile[] {
     const cornerColors = generateCornerColors();
 
     let colorGrid = generateGradientGrid(cornerColors, gridWidth, gridHeight);

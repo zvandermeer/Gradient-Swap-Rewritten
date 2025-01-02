@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router";
 import { sleep } from "../../../../helpers";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
-import { setGameFinished, setGameWon, setHeaderButtonsEnabled, setOverlayVisible, setTimerRunning } from "../../gameSlice";
+import {
+    setGameFinished,
+    setGameWon,
+    setHeaderButtonsEnabled,
+    setOverlayVisible,
+    setTimerRunning,
+} from "../../gameSlice";
 import { newLevel, randomizeTiles } from "../../generation";
 import {
     setGridColumns,
@@ -11,14 +17,22 @@ import {
     setTileTransition,
 } from "../Grid/gridSlice";
 import "./PauseOverlay.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faMinus, faArrowRotateRight, faShareNodes, faEye, faHouse, faPlay } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faPlus,
+    faMinus,
+    faArrowRotateRight,
+    faShareNodes,
+    faEye,
+    faHouse,
+    faPlay,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
     setPageTransition: (state: string) => void;
 }
 
-function PauseOverlay({setPageTransition}: Props) {
+function PauseOverlay({ setPageTransition }: Props) {
     let navigate = useNavigate();
 
     const dispatch = useAppDispatch();
@@ -33,7 +47,9 @@ function PauseOverlay({setPageTransition}: Props) {
     const timerSeconds = useAppSelector(
         (state) => state.game.value.timerSeconds
     );
-    const originalGrid = useAppSelector((state) => state.grid.value.originalLayout);
+    const originalGrid = useAppSelector(
+        (state) => state.grid.value.originalLayout
+    );
     const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
 
     return (
@@ -107,29 +123,44 @@ function PauseOverlay({setPageTransition}: Props) {
                                 className="button"
                                 onClick={async () => {
                                     dispatch(setOverlayVisible(false));
-                                    let solvedGrid = await newLevel(dispatch, rows, columns, true);
+                                    let solvedGrid = await newLevel(
+                                        dispatch,
+                                        rows,
+                                        columns,
+                                        true
+                                    );
                                     await sleep(1300);
                                     randomizeTiles(dispatch, solvedGrid);
                                 }}
                             >
-                                <FontAwesomeIcon icon={faArrowRotateRight} /> Play
-                                again!
+                                <FontAwesomeIcon icon={faArrowRotateRight} />{" "}
+                                Play again!
                             </button>
                         </div>
                         <div className="button-div">
                             <button id="shareButton" className="button">
                                 <FontAwesomeIcon icon={faShareNodes} />
                             </button>
-                            <button id="viewButton" className="button" onClick={() => dispatch(setOverlayVisible(false))}>
+                            <button
+                                id="viewButton"
+                                className="button"
+                                onClick={() =>
+                                    dispatch(setOverlayVisible(false))
+                                }
+                            >
                                 <FontAwesomeIcon icon={faEye} />
                             </button>
-                            <button id="homeButton" className="button" onClick={async () => {
-                                setPageTransition("fade-out");
+                            <button
+                                id="homeButton"
+                                className="button"
+                                onClick={async () => {
+                                    setPageTransition("fade-out");
 
-                                await sleep(500);
+                                    await sleep(500);
 
-                                navigate('/');
-                            }}>
+                                    navigate("/");
+                                }}
+                            >
                                 <FontAwesomeIcon icon={faHouse} />
                             </button>
                         </div>
@@ -144,46 +175,63 @@ function PauseOverlay({setPageTransition}: Props) {
                                     dispatch(setOverlayVisible(false));
                                 }}
                             >
-                                <FontAwesomeIcon icon={faPlay} size="xs"/> Back to Game
+                                <FontAwesomeIcon icon={faPlay} size="xs" /> Back
+                                to Game
                             </button>
                         </div>
                         <div className="button-div">
-                            <button id="pauseSolutionButton" className="button" onClick={async () => {
-                                dispatch(setOverlayVisible(false));
-                                dispatch(setTimerRunning(false));
-                                dispatch(setGridSwappable(false));
-                                dispatch(setGameFinished(true));
-                                dispatch(setGameWon(false));
-                                dispatch(setHeaderButtonsEnabled(false));
+                            <button
+                                id="pauseSolutionButton"
+                                className="button"
+                                onClick={async () => {
+                                    dispatch(setOverlayVisible(false));
+                                    dispatch(setTimerRunning(false));
+                                    dispatch(setGridSwappable(false));
+                                    dispatch(setGameFinished(true));
+                                    dispatch(setGameWon(false));
+                                    dispatch(setHeaderButtonsEnabled(false));
 
-                                await sleep(600);
+                                    await sleep(600);
 
-                                dispatch(setTileTransition("shrink"));
+                                    dispatch(setTileTransition("shrink"));
 
-                                await(sleep(800));
+                                    await sleep(800);
 
-                                dispatch(setOriginalGridLayout({rows: originalGrid.rows, columns: originalGrid.columns, tiles: solvedGrid}));
+                                    dispatch(
+                                        setOriginalGridLayout({
+                                            rows: originalGrid.rows,
+                                            columns: originalGrid.columns,
+                                            tiles: solvedGrid,
+                                        })
+                                    );
 
-                                dispatch(setTileTransition("full"));
+                                    dispatch(setTileTransition("full"));
 
-                                await(sleep(500));
+                                    await sleep(500);
 
-                                dispatch(setTileTransition(""));
-                                dispatch(setHeaderButtonsEnabled(true));
-                            }}>
-                                <FontAwesomeIcon icon={faEye} size="xs"/> Show solution
+                                    dispatch(setTileTransition(""));
+                                    dispatch(setHeaderButtonsEnabled(true));
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faEye} size="xs" /> Show
+                                solution
                             </button>
                         </div>
                         <div className="button-div">
-                            <button id="pauseHomeButton" className="button" onClick={async () => {
-                                dispatch(setOverlayVisible(false));
-                                setPageTransition("fade-out");
+                            <button
+                                id="pauseHomeButton"
+                                className="button"
+                                onClick={async () => {
+                                    dispatch(setOverlayVisible(false));
+                                    setPageTransition("fade-out");
 
-                                await sleep(500);
+                                    await sleep(500);
 
-                                navigate('/');
-                            }}>
-                                <FontAwesomeIcon icon={faHouse} size="xs"/> Go Home
+                                    navigate("/");
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faHouse} size="xs" /> Go
+                                Home
                             </button>
                         </div>
                     </>

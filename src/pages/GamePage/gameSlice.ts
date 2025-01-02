@@ -49,7 +49,7 @@ export const gameSlice = createSlice({
         },
         setHeaderButtonsEnabled: (state, action: PayloadAction<boolean>) => {
             state.value.headerButtonsEnabled = action.payload;
-        }
+        },
     },
 });
 
