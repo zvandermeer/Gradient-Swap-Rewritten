@@ -11,7 +11,7 @@ export default defineConfig({
                 "/fonts/Montserrat-VariableFont_wght.ttf",
                 "icons/favicon.ico",
                 "icons/apple-touch-icon.png",
-                "iosPWASplash.js",
+                "splash_screens/*.png",
             ],
             registerType: "autoUpdate",
             manifest: {
@@ -36,18 +36,6 @@ export default defineConfig({
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any",
-                    },
-                    {
-                        src: "/icons/pwa-maskable-192x192.png",
-                        sizes: "192x192",
-                        type: "image/png",
-                        purpose: "maskable",
-                    },
-                    {
-                        src: "/icons/pwa-maskable-512x512.png",
-                        sizes: "512x512",
-                        type: "image/png",
-                        purpose: "maskable",
                     },
                 ],
             },
