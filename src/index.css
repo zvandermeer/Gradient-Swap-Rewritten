@@ -5,6 +5,10 @@
     font-style: normal;
 }
 
+* {
+    font-synthesis: none;
+}
+
 html {
     height: 100%;
 }
