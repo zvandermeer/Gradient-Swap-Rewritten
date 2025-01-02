@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { clamp, sleep } from "../../../../helpers";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swapy } from "swapy";
 import { createSwapy } from "swapy";
 import "./grid.css";
@@ -59,8 +59,15 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
     );
     const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
 
-    const tileWidth = clamp((window.innerWidth - 40) / columns, 0, 100);
-    const tileHeight = clamp((window.innerHeight - 120) / rows, 0, 100);
+    const [availableScreenWidth, setAvailableScreenWidth] = useState(
+        window.innerWidth - 40
+    );
+    const [availableScreenHeight, setAvailableScreenHeight] = useState(
+        window.innerHeight - 120
+    );
+
+    const tileWidth = clamp(availableScreenWidth / columns, 0, 100);
+    const tileHeight = clamp(availableScreenHeight / rows, 0, 100);
 
     const dotSize = (tileWidth / 10 + tileHeight / 10) / 2;
 
@@ -75,7 +82,10 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
                 // Return true to allow swapping, and return false to prevent swapping.
-                return [GameState.Playing, GameState.Waiting].includes(gameState);
+                return (
+                    gameState === GameState.Playing ||
+                    gameState === GameState.Waiting
+                );
             });
             swapyRef.current.onSwap(() => {
                 incrementSwaps();
@@ -111,6 +121,21 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
         };
     });
 
+    useEffect(() => {
+        function handleResize() {
+            setAvailableScreenWidth(window.innerWidth - 40);
+            setAvailableScreenHeight(window.innerHeight - 120);
+        }
+
+        // Attach the event listener to the window object
+        window.addEventListener("resize", handleResize);
+
+        // Remove the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
     return (
         <div
             key="grid"
@@ -141,7 +166,10 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
                                     }}
                                     data-swapy-item={i.tileColor}
                                 >
-                                    {!([GameState.Playing, GameState.Waiting].includes(gameState)) && (
+                                    {!(
+                                        gameState === GameState.Playing ||
+                                        gameState === GameState.Waiting
+                                    ) && (
                                         <div
                                             key={`swapPreventionDiv${index}`}
                                             data-swapy-no-drag

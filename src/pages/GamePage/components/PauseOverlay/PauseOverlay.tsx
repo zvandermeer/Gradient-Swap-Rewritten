@@ -49,11 +49,17 @@ function PauseOverlay({
 
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const gameState = useAppSelector((state) => state.game.value.gameState, () => true);
-    const statsEnabled = useAppSelector((state) => state.game.value.statsEnabled);
+    const gameState = useAppSelector(
+        (state) => state.game.value.gameState,
+        () => true
+    );
+    const statsEnabled = useAppSelector(
+        (state) => state.game.value.statsEnabled
+    );
 
     const [overlayHiding, setOverlayHiding] = useState(false);
     const [overlayHeader, setOverlayHeader] = useState("");
+    const [overlayScale, setOverlayScale] = useState(0);
 
     useEffect(() => {
         switch (gameState) {
@@ -76,6 +82,28 @@ function PauseOverlay({
             }
         }
     });
+
+    useEffect(() => {
+        function handleResize() {
+            if (window.innerHeight < 555) {
+                setOverlayScale(2);
+            } else if (window.innerHeight < 640) {
+                setOverlayScale(1);
+            } else {
+                setOverlayScale(0);
+            }
+        }
+
+        // Attach the event listener to the window object
+        window.addEventListener("resize", handleResize);
+
+        handleResize();
+
+        // Remove the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     return (
         <div className={"overlay " + (overlayHiding ? "hide" : "")}>
@@ -138,39 +166,49 @@ function PauseOverlay({
                         </button>
                     </div>
                 </div>
-                <div className="button-div">
-                    <button
-                        id="regenerateButton"
-                        className="button"
-                        onClick={async () => {
-                            newLevel(dispatch, rows, columns, 300, true);
-
-                            closeOverlay(setOverlayHiding, setOverlayVisible);
-                        }}
-                    >
-                        <FontAwesomeIcon icon={faArrowRotateRight} size="xs" />{" "}
-                        New Game!
-                    </button>
-                </div>
-                {[GameState.Paused, GameState.Waiting].includes(gameState) && (
+                {overlayScale < 2 && (
                     <div className="button-div">
                         <button
-                            id="pauseSolutionButton"
+                            id="regenerateButton"
                             className="button"
-                            onClick={() => {
-                                solveGame(600);
+                            onClick={async () => {
+                                newLevel(dispatch, rows, columns, 300, true);
+
                                 closeOverlay(
                                     setOverlayHiding,
                                     setOverlayVisible
                                 );
                             }}
                         >
-                            <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
-                            Show solution
+                            <FontAwesomeIcon
+                                icon={faArrowRotateRight}
+                                size="xs"
+                            />{" "}
+                            New Game!
                         </button>
                     </div>
                 )}
-                {gameState === GameState.Won && (
+                {(gameState === GameState.Paused ||
+                    gameState === GameState.Waiting) &&
+                    overlayScale === 0 && (
+                        <div className="button-div">
+                            <button
+                                id="pauseSolutionButton"
+                                className="button"
+                                onClick={() => {
+                                    solveGame(600);
+                                    closeOverlay(
+                                        setOverlayHiding,
+                                        setOverlayVisible
+                                    );
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
+                                Show solution
+                            </button>
+                        </div>
+                    )}
+                {gameState === GameState.Won && overlayScale === 0 && (
                     <div className="button-div">
                         <button id="shareButton" className="button">
                             <FontAwesomeIcon icon={faShareNodes} /> Share!
@@ -187,6 +225,45 @@ function PauseOverlay({
                     >
                         <FontAwesomeIcon icon={faRectangleXmark} size="lg" />
                     </button>
+                    {(gameState === GameState.Paused ||
+                        gameState === GameState.Waiting) &&
+                        overlayScale > 0 && (
+                            <button
+                                className="button"
+                                onClick={() => {
+                                    solveGame(600);
+                                    closeOverlay(
+                                        setOverlayHiding,
+                                        setOverlayVisible
+                                    );
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faLightbulb} size="xs" />
+                            </button>
+                        )}
+                    {gameState === GameState.Won && overlayScale > 1 && (
+                        <button className="button">
+                            <FontAwesomeIcon icon={faShareNodes} />
+                        </button>
+                    )}
+                    {overlayScale === 2 && (
+                        <button
+                            className="button"
+                            onClick={async () => {
+                                newLevel(dispatch, rows, columns, 300, true);
+
+                                closeOverlay(
+                                    setOverlayHiding,
+                                    setOverlayVisible
+                                );
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={faArrowRotateRight}
+                                size="xs"
+                            />
+                        </button>
+                    )}
                     <button
                         id="homeButton"
                         className="button"
