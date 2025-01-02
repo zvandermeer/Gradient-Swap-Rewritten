@@ -4,17 +4,8 @@ import { useEffect, useRef } from "react";
 import { Swapy } from "swapy";
 import { createSwapy } from "swapy";
 import "./grid.css";
-import {
-    incrementGameSwaps,
-    incrementTimer,
-    setGameFinished,
-    setGameWon,
-    setHeaderButtonsEnabled,
-    setOverlayVisible,
-    setTimerRunning,
-} from "../../gameSlice";
-import { setGridSwappable } from "./gridSlice";
 import JSConfetti from "js-confetti";
+import { GameState, setGameState } from "../../gameSlice";
 
 export type GridLayout = {
     rows: number;
@@ -28,6 +19,11 @@ export type Tile = {
 };
 
 const jsConfetti = new JSConfetti();
+
+interface Props {
+    incrementSwaps: () => void;
+    setOverlayVisible: (state: boolean) => void;
+}
 
 function evaluateGrid(
     solvedGridLayout: Tile[],
@@ -45,8 +41,10 @@ function evaluateGrid(
     return true;
 }
 
-function Grid() {
+function Grid({ incrementSwaps, setOverlayVisible }: Props) {
     const dispatch = useAppDispatch();
+
+    const gameState = useAppSelector((state) => state.game.value.gameState);
 
     const gridTransition = useAppSelector(
         (state) => state.grid.value.gridTransition
@@ -60,10 +58,6 @@ function Grid() {
         (state) => state.grid.value.originalLayout
     );
     const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
-    const swappable = useAppSelector((state) => state.grid.value.swappable);
-    const timerRunning = useAppSelector(
-        (state) => state.game.value.timerRunning
-    );
 
     const tileWidth = clamp((window.innerWidth - 40) / columns, 0, 100);
     const tileHeight = clamp((window.innerHeight - 120) / rows, 0, 100);
@@ -74,26 +68,23 @@ function Grid() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const timer = setInterval(function () {
-            if (timerRunning) {
-                dispatch(incrementTimer());
-            }
-        }, 1000);
-
         if (containerRef.current) {
             swapyRef.current = createSwapy(containerRef.current, {
                 swapMode: "drop",
             });
-
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
                 // Return true to allow swapping, and return false to prevent swapping.
-                return swappable;
+                return [GameState.Playing, GameState.Waiting].includes(gameState);
             });
             swapyRef.current.onSwap(() => {
-                dispatch(incrementGameSwaps());
+                incrementSwaps();
             });
             swapyRef.current.onSwapEnd(async () => {
+                if (gameState === GameState.Waiting) {
+                    dispatch(setGameState(GameState.Playing));
+                }
+
                 const slotMap = swapyRef.current?.slotItemMap().asObject;
 
                 const internalLayout = [] as string[];
@@ -105,24 +96,18 @@ function Grid() {
                 }
 
                 if (evaluateGrid(solvedGrid, internalLayout)) {
-                    dispatch(setHeaderButtonsEnabled(false));
-                    dispatch(setGameFinished(true));
-                    dispatch(setGameWon(true));
-                    dispatch(setTimerRunning(false));
-                    dispatch(setGridSwappable(false));
+                    dispatch(setGameState(GameState.Won));
 
                     jsConfetti.addConfetti();
 
                     await sleep(1800);
 
-                    dispatch(setOverlayVisible(true));
+                    setOverlayVisible(true);
                 }
             });
         }
         return () => {
             swapyRef.current?.destroy();
-
-            clearInterval(timer);
         };
     });
 
@@ -156,7 +141,7 @@ function Grid() {
                                     }}
                                     data-swapy-item={i.tileColor}
                                 >
-                                    {!swappable && (
+                                    {!([GameState.Playing, GameState.Waiting].includes(gameState)) && (
                                         <div
                                             key={`swapPreventionDiv${index}`}
                                             data-swapy-no-drag

@@ -12,7 +12,6 @@ export const gridSlice = createSlice({
             tileTransition: "",
             originalLayout: {} as GridLayout,
             solvedGrid: [] as Tile[],
-            swappable: false,
         },
     },
     reducers: {
@@ -38,9 +37,6 @@ export const gridSlice = createSlice({
         setSolvedGridLayout: (state, action: PayloadAction<Tile[]>) => {
             state.value.solvedGrid = action.payload;
         },
-        setGridSwappable: (state, action: PayloadAction<boolean>) => {
-            state.value.swappable = action.payload;
-        },
     },
 });
 
@@ -51,7 +47,6 @@ export const {
     setTileTransition,
     setOriginalGridLayout,
     setSolvedGridLayout,
-    setGridSwappable,
 } = gridSlice.actions;
 
 export const selectGrid = (state: RootState) => state.grid.value;

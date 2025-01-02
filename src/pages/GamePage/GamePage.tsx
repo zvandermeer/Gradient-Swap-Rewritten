@@ -3,53 +3,111 @@ import GameHeader from "./components/GameHeader/GameHeader";
 import "./gamePage.css";
 import { useEffect, useState } from "react";
 import { sleep } from "../../helpers";
-import { randomizeTiles } from "./generation";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useNavigate } from "react-router";
 import PauseOverlay from "./components/PauseOverlay/PauseOverlay";
-import { setGameLoaded } from "./gameSlice";
+import { GameState, setGameState } from "./gameSlice";
+import {
+    setOriginalGridLayout,
+    setTileTransition,
+} from "./components/Grid/gridSlice";
 
-function GamePage() {
-    let navigate = useNavigate();
+async function solveGame(solveDelay: number) {
     const dispatch = useAppDispatch();
 
     const originalGrid = useAppSelector(
         (state) => state.grid.value.originalLayout
     );
-    const gameLoaded = useAppSelector((state) => state.game.value.loaded);
+    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
+
+    await sleep(solveDelay);
+
+    dispatch(setTileTransition("shrink"));
+
+    await sleep(800);
+
+    dispatch(
+        setOriginalGridLayout({
+            rows: originalGrid.rows,
+            columns: originalGrid.columns,
+            tiles: solvedGrid,
+        })
+    );
+
+    dispatch(setTileTransition("full"));
+
+    await sleep(500);
+
+    dispatch(setTileTransition(""));
+    dispatch(setGameState(GameState.Lost));
+}
+
+function GamePage() {
+    let navigate = useNavigate();
+
+    const originalGrid = useAppSelector(
+        (state) => state.grid.value.originalLayout
+    );
+    const gameState = useAppSelector((state) => state.game.value.gameState);
 
     const [pageTransition, setPageTransition] = useState("fade-in");
+    const [swaps, setSwaps] = useState(0);
+    const [timer, setTimer] = useState(0);
+    const [overlayVisible, setOverlayVisible] = useState(false);
+
+    useEffect(() => {
+        const timerFunc = setInterval(function () {
+            if (gameState === GameState.Playing) {
+                setTimer(timer + 1);
+            }
+        }, 1000);
+
+        return () => {
+            clearInterval(timerFunc);
+        };
+    });
 
     useEffect(() => {
         const run = async () => {
             if (Object.keys(originalGrid).length === 0) {
                 navigate("/");
             } else {
-                if (!gameLoaded) {
-                    dispatch(setGameLoaded(true));
+                if (pageTransition === "fade-in") {
                     await sleep(500);
                     setPageTransition("");
-
-                    randomizeTiles(dispatch, originalGrid);
                 }
             }
         };
         run();
-    }, []);
+    }, [])
 
     return (
         <>
             {Object.keys(originalGrid).length !== 0 && (
                 <>
                     <div id="game-screen" className={pageTransition}>
-                        <GameHeader />
-                        <Grid />
+                        <GameHeader
+                            setOverlayVisible={setOverlayVisible}
+                            overlayVisible={overlayVisible}
+                            swaps={swaps}
+                            timer={timer}
+                        />
+                        <Grid
+                            incrementSwaps={() => {
+                                setSwaps(swaps + 1);
+                            }}
+                            setOverlayVisible={setOverlayVisible}
+                        />
                     </div>
-                    <PauseOverlay
-                        setPageTransition={(state: string) => {
-                            setPageTransition(state);
-                        }}
-                    />
+                    {overlayVisible && (
+                        <PauseOverlay
+                            setPageTransition={setPageTransition}
+                            setOverlayVisible={setOverlayVisible}
+                            solveGame={solveGame}
+                            timer={timer}
+                            swaps={swaps}
+                        />
+                    )}
                 </>
             )}
         </>

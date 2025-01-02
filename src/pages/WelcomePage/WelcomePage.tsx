@@ -8,9 +8,9 @@ import "./welcomePage.css";
 import { useEffect, useState } from "react";
 import { newLevel } from "../GamePage/generation";
 import { sleep } from "../../helpers";
-import { setGameLoaded } from "../GamePage/gameSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
+import { GameState, setGameState } from "../GamePage/gameSlice";
 
 function WelcomePage() {
     let navigate = useNavigate();
@@ -18,13 +18,13 @@ function WelcomePage() {
 
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const gameLoaded = useAppSelector((state) => state.game.value.loaded);
+    const gameState = useAppSelector((state) => state.game.value.gameState);
 
     const [pageTransition, setPageTransition] = useState("");
 
     useEffect(() => {
-        if (gameLoaded) {
-            dispatch(setGameLoaded(false));
+        if (gameState !== GameState.Home) {
+            dispatch(setGameState(GameState.Home));
             setPageTransition("fade-in");
         }
     }, []);
@@ -76,11 +76,11 @@ function WelcomePage() {
             <button
                 className="button create-button"
                 onClick={async () => {
-                    newLevel(dispatch, rows, columns, false);
-
                     setPageTransition("fade-out");
 
                     await sleep(500);
+
+                    newLevel(dispatch, rows, columns, 500, false);
 
                     navigate("game");
                 }}

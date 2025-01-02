@@ -1,23 +1,29 @@
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import "./gameHeader.css";
-import { newLevel, randomizeTiles } from "../../generation";
-import { setOverlayVisible } from "../../gameSlice";
-import { sleep } from "../../../../helpers";
+import { newLevel } from "../../generation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
+import { GameState, setGameState } from "../../gameSlice";
 
-function GameHeader() {
+interface Props {
+    setOverlayVisible: (state: boolean) => void;
+    overlayVisible: boolean;
+    swaps: number;
+    timer: number;
+}
+
+function GameHeader({
+    setOverlayVisible,
+    overlayVisible,
+    swaps,
+    timer,
+}: Props) {
     const dispatch = useAppDispatch();
 
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const swaps = useAppSelector((state) => state.game.value.swaps);
-    const timerSeconds = useAppSelector(
-        (state) => state.game.value.timerSeconds
-    );
-    const headerButtonsEnabled = useAppSelector(
-        (state) => state.game.value.headerButtonsEnabled
-    );
+    const gameState = useAppSelector((state) => state.game.value.gameState);
+    const statsEnabled = useAppSelector((state) => state.game.value.statsEnabled);
 
     return (
         <div id="controls">
@@ -26,22 +32,26 @@ function GameHeader() {
                     id="header-menu"
                     className="button"
                     onClick={() => {
-                        dispatch(setOverlayVisible(true));
+                        if (
+                            !overlayVisible &&
+                            gameState !== GameState.Generating
+                        ) {
+                            if (gameState === GameState.Playing ) {
+                                dispatch(setGameState(GameState.Paused));
+                            }
+                            setOverlayVisible(true);
+                        }
                     }}
                 >
                     <FontAwesomeIcon icon={faBars} />
                 </button>
                 <button
                     onClick={async () => {
-                        if (headerButtonsEnabled) {
-                            let solvedGrid = await newLevel(
-                                dispatch,
-                                rows,
-                                columns,
-                                true
-                            );
-                            await sleep(1300);
-                            randomizeTiles(dispatch, solvedGrid);
+                        if (
+                            !overlayVisible &&
+                            gameState !== GameState.Generating
+                        ) {
+                            newLevel(dispatch, rows, columns, 300, true);
                         }
                     }}
                     id="header-restart"
@@ -50,15 +60,17 @@ function GameHeader() {
                     <FontAwesomeIcon icon={faArrowRotateRight} />
                 </button>
             </div>
-            <div id="header-stats">
-                <div>
-                    <span id="swaps">Swaps: {swaps}</span>
-                    <span id="timer">
-                        {Math.floor(timerSeconds / 60)}:
-                        {(timerSeconds % 60).toString().padStart(2, "0")}
-                    </span>
+            {statsEnabled && (
+                <div id="header-stats">
+                    <div>
+                        <span id="swaps">Swaps: {swaps}</span>
+                        <span id="timer">
+                            {Math.floor(timer / 60)}:
+                            {(timer % 60).toString().padStart(2, "0")}
+                        </span>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
