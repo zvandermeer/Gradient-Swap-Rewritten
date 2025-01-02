@@ -11,6 +11,8 @@ import {
     setTileTransition,
 } from "../Grid/gridSlice";
 import "./PauseOverlay.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faMinus, faArrowRotateRight, faShareNodes, faEye, faHouse, faPlay } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     setPageTransition: (state: string) => void;
@@ -63,7 +65,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                         dispatch(setGridColumns(columns + 1))
                                     }
                                 >
-                                    <i className="bi bi-plus"></i>
+                                    <FontAwesomeIcon icon={faPlus} />
                                 </button>
                                 <p id="finalWidthLabel">{columns}</p>
                                 <button
@@ -73,7 +75,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                         dispatch(setGridColumns(columns - 1))
                                     }
                                 >
-                                    <i className="bi bi-dash"></i>
+                                    <FontAwesomeIcon icon={faMinus} />
                                 </button>
                             </div>
                             <div>
@@ -85,7 +87,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                         dispatch(setGridRows(rows + 1))
                                     }
                                 >
-                                    <i className="bi bi-plus"></i>
+                                    <FontAwesomeIcon icon={faPlus} />
                                 </button>
                                 <p id="finalHeightLabel">{rows}</p>
                                 <button
@@ -95,7 +97,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                         dispatch(setGridRows(rows - 1))
                                     }
                                 >
-                                    <i className="bi bi-dash"></i>
+                                    <FontAwesomeIcon icon={faMinus} />
                                 </button>
                             </div>
                         </div>
@@ -110,16 +112,16 @@ function PauseOverlay({setPageTransition}: Props) {
                                     randomizeTiles(dispatch, solvedGrid);
                                 }}
                             >
-                                <i className="bi bi-arrow-clockwise"></i> Play
+                                <FontAwesomeIcon icon={faArrowRotateRight} /> Play
                                 again!
                             </button>
                         </div>
                         <div className="button-div">
                             <button id="shareButton" className="button">
-                                <i className="bi bi-share"></i>
+                                <FontAwesomeIcon icon={faShareNodes} />
                             </button>
                             <button id="viewButton" className="button" onClick={() => dispatch(setOverlayVisible(false))}>
-                                <i className="bi bi-eye"></i>
+                                <FontAwesomeIcon icon={faEye} />
                             </button>
                             <button id="homeButton" className="button" onClick={async () => {
                                 setPageTransition("fade-out");
@@ -128,7 +130,7 @@ function PauseOverlay({setPageTransition}: Props) {
 
                                 navigate('/');
                             }}>
-                                <i className="bi bi-house-door"></i>
+                                <FontAwesomeIcon icon={faHouse} />
                             </button>
                         </div>
                     </>
@@ -142,7 +144,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                     dispatch(setOverlayVisible(false));
                                 }}
                             >
-                                <i className="bi bi-play-fill"></i> Back to Game
+                                <FontAwesomeIcon icon={faPlay} size="xs"/> Back to Game
                             </button>
                         </div>
                         <div className="button-div">
@@ -169,7 +171,7 @@ function PauseOverlay({setPageTransition}: Props) {
                                 dispatch(setTileTransition(""));
                                 dispatch(setHeaderButtonsEnabled(true));
                             }}>
-                                <i className="bi bi-eye"></i> Show solution
+                                <FontAwesomeIcon icon={faEye} size="xs"/> Show solution
                             </button>
                         </div>
                         <div className="button-div">
@@ -181,7 +183,7 @@ function PauseOverlay({setPageTransition}: Props) {
 
                                 navigate('/');
                             }}>
-                                <i className="bi bi-house-door"></i> Go Home
+                                <FontAwesomeIcon icon={faHouse} size="xs"/> Go Home
                             </button>
                         </div>
                     </>

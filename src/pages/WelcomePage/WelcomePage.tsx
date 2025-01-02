@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { newLevel } from "../GamePage/generation";
 import { sleep } from "../../helpers";
 import { setGameLoaded } from "../GamePage/gameSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 
 function WelcomePage() {
     let navigate = useNavigate();
@@ -41,7 +43,7 @@ function WelcomePage() {
                         className="button"
                         onClick={() => dispatch(setGridColumns(columns + 1))}
                     >
-                        <i className="bi bi-plus"></i>
+                        <FontAwesomeIcon icon={faPlus} />
                     </button>
                     <p id="widthLabel">{columns}</p>
                     <button
@@ -49,7 +51,7 @@ function WelcomePage() {
                         className="button"
                         onClick={() => dispatch(setGridColumns(columns - 1))}
                     >
-                        <i className="bi bi-dash"></i>
+                        <FontAwesomeIcon icon={faMinus} />
                     </button>
                 </div>
                 <div>Height</div>
@@ -59,7 +61,7 @@ function WelcomePage() {
                         className="button"
                         onClick={() => dispatch(setGridRows(rows + 1))}
                     >
-                        <i className="bi bi-plus"></i>
+                        <FontAwesomeIcon icon={faPlus} />
                     </button>
                     <p id="heightLabel">{rows}</p>
                     <button
@@ -67,7 +69,7 @@ function WelcomePage() {
                         className="button"
                         onClick={() => dispatch(setGridRows(rows - 1))}
                     >
-                        <i className="bi bi-dash"></i>
+                        <FontAwesomeIcon icon={faMinus} />
                     </button>
                 </div>
             </div>
