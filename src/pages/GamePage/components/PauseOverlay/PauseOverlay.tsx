@@ -125,14 +125,14 @@ function PauseOverlay({
                     <div className="stats">
                         <div className="time">
                             <div>Time:</div>
-                            <div id="overlayTime">
+                            <div>
                                 {Math.floor(timer / 60)}:
                                 {(timer % 60).toString().padStart(2, "0")}
                             </div>
                         </div>
                         <div className="swaps">
                             <div>Swaps:</div>
-                            <div id="overlaySwaps">{swaps}</div>
+                            <div>{swaps}</div>
                         </div>
                     </div>
                 )}
@@ -140,7 +140,6 @@ function PauseOverlay({
                     <div>
                         <p>Width</p>
                         <button
-                            id="finalWidthPlusButton"
                             className="button"
                             onClick={() =>
                                 dispatch(setGridColumns(columns + 1))
@@ -148,9 +147,8 @@ function PauseOverlay({
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </button>
-                        <p id="finalWidthLabel">{columns}</p>
+                        <p>{columns}</p>
                         <button
-                            id="finalWidthMinusButton"
                             className="button"
                             onClick={() =>
                                 dispatch(setGridColumns(columns - 1))
@@ -162,15 +160,13 @@ function PauseOverlay({
                     <div>
                         <p>Height</p>
                         <button
-                            id="finalHeightPlusButton"
                             className="button"
                             onClick={() => dispatch(setGridRows(rows + 1))}
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </button>
-                        <p id="finalHeightLabel">{rows}</p>
+                        <p>{rows}</p>
                         <button
-                            id="finalHeightMinusButton"
                             className="button"
                             onClick={() => dispatch(setGridRows(rows - 1))}
                         >
@@ -181,7 +177,6 @@ function PauseOverlay({
                 {overlayScale < 2 && (
                     <div className="button-div">
                         <button
-                            id="regenerateButton"
                             className="button"
                             onClick={async () => {
                                 newLevel(
@@ -212,7 +207,6 @@ function PauseOverlay({
                     overlayScale === 0 && (
                         <div className="button-div">
                             <button
-                                id="pauseSolutionButton"
                                 className="button"
                                 onClick={() => {
                                     solveGame(
@@ -235,14 +229,13 @@ function PauseOverlay({
                     )}
                 {gameState === GameState.Won && overlayScale === 0 && (
                     <div className="button-div">
-                        <button id="shareButton" className="button">
+                        <button className="button">
                             <FontAwesomeIcon icon={faShareNodes} /> Share!
                         </button>
                     </div>
                 )}
                 <div className="button-div">
                     <button
-                        id="viewButton"
                         className="button"
                         onClick={() =>
                             closeOverlay(setOverlayHiding, setOverlayVisible)
@@ -303,7 +296,6 @@ function PauseOverlay({
                         </button>
                     )}
                     <button
-                        id="homeButton"
                         className="button"
                         onClick={async () => {
                             closeOverlay(setOverlayHiding, setOverlayVisible);
