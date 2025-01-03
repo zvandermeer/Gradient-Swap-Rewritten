@@ -16,14 +16,17 @@ export async function newLevel(
     rows: number,
     columns: number,
     tileTransitionDelay: number,
-    fadeGrid: boolean
+    fadeGrid: boolean,
+    setGridLoaded?: (item: boolean) => void
 ) {
     dispatch(setGameState(GameState.Generating));
 
-    if (fadeGrid) {
+    if (fadeGrid && setGridLoaded) {
         dispatch(setGridTransition("fade-out"));
 
-        await sleep(600);
+        await sleep(500);
+
+        setGridLoaded(false);
     }
 
     const tileList = generateNewTileList(columns, rows);
@@ -38,8 +41,11 @@ export async function newLevel(
 
     dispatch(setSolvedGridLayout(tileList));
 
-    if (fadeGrid) {
+    if (fadeGrid && setGridLoaded) {
+        await sleep(100);
+
         dispatch(setGridTransition("fade-in"));
+        setGridLoaded(true);
 
         await sleep(500);
     }

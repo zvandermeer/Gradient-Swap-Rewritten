@@ -38,7 +38,6 @@ export const gameSlice = createSlice({
             state.value.swaps = 0;
         },
         incrementSwaps: (state) => {
-            console.log("blub");
             state.value.swaps += 1;
         },
     },

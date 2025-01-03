@@ -13,12 +13,20 @@ import {
 } from "./components/Grid/gridSlice";
 import { AppDispatch } from "../../store";
 
-async function solveGame(solveDelay: number, dispatch: AppDispatch, originalGrid: GridLayout, solvedGrid: Tile[]) {
+async function solveGame(
+    solveDelay: number,
+    dispatch: AppDispatch,
+    originalGrid: GridLayout,
+    solvedGrid: Tile[],
+    setGridLoaded: (state: boolean) => void
+) {
     await sleep(solveDelay);
 
     dispatch(setTileTransition("shrink"));
 
-    await sleep(800);
+    await sleep(500);
+
+    setGridLoaded(false);
 
     dispatch(
         setOriginalGridLayout({
@@ -27,6 +35,10 @@ async function solveGame(solveDelay: number, dispatch: AppDispatch, originalGrid
             tiles: solvedGrid,
         })
     );
+
+    await sleep(300);
+
+    setGridLoaded(true);
 
     dispatch(setTileTransition("full"));
 
@@ -45,6 +57,7 @@ function GamePage() {
 
     const [pageTransition, setPageTransition] = useState("fade-in");
     const [overlayVisible, setOverlayVisible] = useState(false);
+    const [gridLoaded, setGridLoaded] = useState(true);
 
     useEffect(() => {
         const run = async () => {
@@ -68,14 +81,19 @@ function GamePage() {
                         <GameHeader
                             setOverlayVisible={setOverlayVisible}
                             overlayVisible={overlayVisible}
+                            setGridLoaded={setGridLoaded}
                         />
-                        <Grid setOverlayVisible={setOverlayVisible} />
+                        <Grid
+                            setOverlayVisible={setOverlayVisible}
+                            gridLoaded={gridLoaded}
+                        />
                     </div>
                     {overlayVisible && (
                         <PauseOverlay
                             setPageTransition={setPageTransition}
                             setOverlayVisible={setOverlayVisible}
                             solveGame={solveGame}
+                            setGridLoaded={setGridLoaded}
                         />
                     )}
                 </>

@@ -7,11 +7,16 @@ import { GameState, incrementTimer, setGameState } from "../../gameSlice";
 import { useEffect } from "react";
 
 interface Props {
+    setGridLoaded: (state: boolean) => void;
     setOverlayVisible: (state: boolean) => void;
     overlayVisible: boolean;
 }
 
-function GameHeader({ setOverlayVisible, overlayVisible }: Props) {
+function GameHeader({
+    setGridLoaded,
+    setOverlayVisible,
+    overlayVisible,
+}: Props) {
     const dispatch = useAppDispatch();
 
     const rows = useAppSelector((state) => state.grid.value.rows);
@@ -33,7 +38,7 @@ function GameHeader({ setOverlayVisible, overlayVisible }: Props) {
         return () => {
             clearInterval(x);
         };
-    });
+    }, [gameState]);
 
     return (
         <div id="controls">
@@ -61,7 +66,14 @@ function GameHeader({ setOverlayVisible, overlayVisible }: Props) {
                             !overlayVisible &&
                             gameState !== GameState.Generating
                         ) {
-                            newLevel(dispatch, rows, columns, 300, true);
+                            newLevel(
+                                dispatch,
+                                rows,
+                                columns,
+                                300,
+                                true,
+                                setGridLoaded
+                            );
                         }
                     }}
                     id="header-restart"
