@@ -48,24 +48,9 @@ function GamePage() {
     const originalGrid = useAppSelector(
         (state) => state.grid.value.originalLayout
     );
-    const gameState = useAppSelector((state) => state.game.value.gameState);
 
     const [pageTransition, setPageTransition] = useState("fade-in");
-    const [swaps, setSwaps] = useState(0);
-    const [timer, setTimer] = useState(0);
     const [overlayVisible, setOverlayVisible] = useState(false);
-
-    useEffect(() => {
-        const timerFunc = setInterval(function () {
-            if (gameState === GameState.Playing) {
-                setTimer(timer + 1);
-            }
-        }, 1000);
-
-        return () => {
-            clearInterval(timerFunc);
-        };
-    });
 
     useEffect(() => {
         const run = async () => {
@@ -79,7 +64,7 @@ function GamePage() {
             }
         };
         run();
-    }, [])
+    }, []);
 
     return (
         <>
@@ -89,23 +74,14 @@ function GamePage() {
                         <GameHeader
                             setOverlayVisible={setOverlayVisible}
                             overlayVisible={overlayVisible}
-                            swaps={swaps}
-                            timer={timer}
                         />
-                        <Grid
-                            incrementSwaps={() => {
-                                setSwaps(swaps + 1);
-                            }}
-                            setOverlayVisible={setOverlayVisible}
-                        />
+                        <Grid setOverlayVisible={setOverlayVisible} />
                     </div>
                     {overlayVisible && (
                         <PauseOverlay
                             setPageTransition={setPageTransition}
                             setOverlayVisible={setOverlayVisible}
                             solveGame={solveGame}
-                            timer={timer}
-                            swaps={swaps}
                         />
                     )}
                 </>

@@ -3,27 +3,37 @@ import "./gameHeader.css";
 import { newLevel } from "../../generation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
-import { GameState, setGameState } from "../../gameSlice";
+import { GameState, incrementTimer, setGameState } from "../../gameSlice";
+import { useEffect } from "react";
 
 interface Props {
     setOverlayVisible: (state: boolean) => void;
     overlayVisible: boolean;
-    swaps: number;
-    timer: number;
 }
 
-function GameHeader({
-    setOverlayVisible,
-    overlayVisible,
-    swaps,
-    timer,
-}: Props) {
+function GameHeader({ setOverlayVisible, overlayVisible }: Props) {
     const dispatch = useAppDispatch();
 
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
     const gameState = useAppSelector((state) => state.game.value.gameState);
-    const statsEnabled = useAppSelector((state) => state.game.value.statsEnabled);
+    const statsEnabled = useAppSelector(
+        (state) => state.game.value.statsEnabled
+    );
+    const swaps = useAppSelector((state) => state.game.value.swaps);
+    const timer = useAppSelector((state) => state.game.value.timer);
+
+    useEffect(() => {
+        const x = setInterval(function () {
+            if (gameState === GameState.Playing) {
+                dispatch(incrementTimer());
+            }
+        }, 1000);
+
+        return () => {
+            clearInterval(x);
+        };
+    });
 
     return (
         <div id="controls">
@@ -36,7 +46,7 @@ function GameHeader({
                             !overlayVisible &&
                             gameState !== GameState.Generating
                         ) {
-                            if (gameState === GameState.Playing ) {
+                            if (gameState === GameState.Playing) {
                                 dispatch(setGameState(GameState.Paused));
                             }
                             setOverlayVisible(true);

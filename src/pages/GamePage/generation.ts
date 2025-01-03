@@ -16,7 +16,7 @@ export async function newLevel(
     rows: number,
     columns: number,
     tileTransitionDelay: number,
-    fadeGrid: boolean,
+    fadeGrid: boolean
 ) {
     dispatch(setGameState(GameState.Generating));
 

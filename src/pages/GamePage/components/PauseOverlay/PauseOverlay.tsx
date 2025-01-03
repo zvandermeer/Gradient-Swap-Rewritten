@@ -21,8 +21,6 @@ interface Props {
     setPageTransition: (state: string) => void;
     setOverlayVisible: (state: boolean) => void;
     solveGame: (solveDelay: number) => void;
-    timer: number;
-    swaps: number;
 }
 
 async function closeOverlay(
@@ -40,8 +38,6 @@ function PauseOverlay({
     setPageTransition,
     setOverlayVisible,
     solveGame,
-    timer,
-    swaps,
 }: Props) {
     let navigate = useNavigate();
 
@@ -56,6 +52,8 @@ function PauseOverlay({
     const statsEnabled = useAppSelector(
         (state) => state.game.value.statsEnabled
     );
+    const swaps = useAppSelector((state) => state.game.value.swaps);
+    const timer = useAppSelector((state) => state.game.value.timer);
 
     const [overlayHiding, setOverlayHiding] = useState(false);
     const [overlayHeader, setOverlayHeader] = useState("");
