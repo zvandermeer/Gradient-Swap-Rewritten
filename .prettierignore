@@ -1,0 +1,9 @@
+index.html
+*.json
+pnpm-lock.yaml
+README.md
+eslint.config.js
+.prettierrc
+.github/
+dist/
+.vscode/

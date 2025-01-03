@@ -1,193 +1,284 @@
 import { useNavigate } from "react-router";
 import { sleep } from "../../../../helpers";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
-import { setGameFinished, setGameWon, setHeaderButtonsEnabled, setOverlayVisible, setTimerRunning } from "../../gameSlice";
-import { newLevel, randomizeTiles } from "../../generation";
-import {
-    setGridColumns,
-    setGridRows,
-    setGridSwappable,
-    setOriginalGridLayout,
-    setTileTransition,
-} from "../Grid/gridSlice";
+import { newLevel } from "../../generation";
+import { setGridColumns, setGridRows } from "../Grid/gridSlice";
 import "./PauseOverlay.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faMinus, faArrowRotateRight, faShareNodes, faEye, faHouse, faPlay } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faPlus,
+    faMinus,
+    faArrowRotateRight,
+    faShareNodes,
+    faHouse,
+    faLightbulb,
+} from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
+import { GameState } from "../../gameSlice";
+import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
 
 interface Props {
     setPageTransition: (state: string) => void;
+    setOverlayVisible: (state: boolean) => void;
+    solveGame: (solveDelay: number) => void;
+    timer: number;
+    swaps: number;
 }
 
-function PauseOverlay({setPageTransition}: Props) {
+async function closeOverlay(
+    setOverlayHiding: (state: boolean) => void,
+    setOverlayVisible: (state: boolean) => void
+) {
+    setOverlayHiding(true);
+
+    await sleep(500);
+
+    setOverlayVisible(false);
+}
+
+function PauseOverlay({
+    setPageTransition,
+    setOverlayVisible,
+    solveGame,
+    timer,
+    swaps,
+}: Props) {
     let navigate = useNavigate();
 
     const dispatch = useAppDispatch();
 
-    const overlayVisible = useAppSelector(
-        (state) => state.game.value.overlayVisible
-    );
-    const gameFinished = useAppSelector((state) => state.game.value.finished);
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const swaps = useAppSelector((state) => state.game.value.swaps);
-    const timerSeconds = useAppSelector(
-        (state) => state.game.value.timerSeconds
+    const gameState = useAppSelector(
+        (state) => state.game.value.gameState,
+        () => true
     );
-    const originalGrid = useAppSelector((state) => state.grid.value.originalLayout);
-    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
+    const statsEnabled = useAppSelector(
+        (state) => state.game.value.statsEnabled
+    );
+
+    const [overlayHiding, setOverlayHiding] = useState(false);
+    const [overlayHeader, setOverlayHeader] = useState("");
+    const [overlayScale, setOverlayScale] = useState(0);
+
+    useEffect(() => {
+        switch (gameState) {
+            case GameState.Won: {
+                setOverlayHeader("You win!");
+                break;
+            }
+            case GameState.Lost: {
+                setOverlayHeader("Play again?");
+                break;
+            }
+            case GameState.Waiting:
+            case GameState.Paused: {
+                setOverlayHeader("Game paused");
+                break;
+            }
+            default: {
+                setOverlayHeader("Unknown game state");
+                break;
+            }
+        }
+    });
+
+    useEffect(() => {
+        function handleResize() {
+            if (window.innerHeight < 555) {
+                setOverlayScale(2);
+            } else if (window.innerHeight < 640) {
+                setOverlayScale(1);
+            } else {
+                setOverlayScale(0);
+            }
+        }
+
+        // Attach the event listener to the window object
+        window.addEventListener("resize", handleResize);
+
+        handleResize();
+
+        // Remove the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     return (
-        <div className={"overlay " + (overlayVisible ? "" : "hidden")}>
+        <div className={"overlay " + (overlayHiding ? "hide" : "")}>
             <div className="box">
-                <h2>{gameFinished ? "You win!" : "Game Paused"}</h2>
-                <div className="stats">
-                    <div className="time">
-                        <div>Time:</div>
-                        <div id="overlayTime">
-                            {Math.floor(timerSeconds / 60)}:
-                            {(timerSeconds % 60).toString().padStart(2, "0")}
+                <h2>{overlayHeader}</h2>
+                {statsEnabled && (
+                    <div className="stats">
+                        <div className="time">
+                            <div>Time:</div>
+                            <div id="overlayTime">
+                                {Math.floor(timer / 60)}:
+                                {(timer % 60).toString().padStart(2, "0")}
+                            </div>
+                        </div>
+                        <div className="swaps">
+                            <div>Swaps:</div>
+                            <div id="overlaySwaps">{swaps}</div>
                         </div>
                     </div>
-                    <div className="swaps">
-                        <div>Swaps:</div>
-                        <div id="overlaySwaps">{swaps}</div>
+                )}
+                <div className="final-dimension-adjust">
+                    <div>
+                        <p>Width</p>
+                        <button
+                            id="finalWidthPlusButton"
+                            className="button"
+                            onClick={() =>
+                                dispatch(setGridColumns(columns + 1))
+                            }
+                        >
+                            <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                        <p id="finalWidthLabel">{columns}</p>
+                        <button
+                            id="finalWidthMinusButton"
+                            className="button"
+                            onClick={() =>
+                                dispatch(setGridColumns(columns - 1))
+                            }
+                        >
+                            <FontAwesomeIcon icon={faMinus} />
+                        </button>
+                    </div>
+                    <div>
+                        <p>Height</p>
+                        <button
+                            id="finalHeightPlusButton"
+                            className="button"
+                            onClick={() => dispatch(setGridRows(rows + 1))}
+                        >
+                            <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                        <p id="finalHeightLabel">{rows}</p>
+                        <button
+                            id="finalHeightMinusButton"
+                            className="button"
+                            onClick={() => dispatch(setGridRows(rows - 1))}
+                        >
+                            <FontAwesomeIcon icon={faMinus} />
+                        </button>
                     </div>
                 </div>
-                {gameFinished ? (
-                    <>
-                        <div className="final-dimension-adjust">
-                            <div>
-                                <p>Width</p>
-                                <button
-                                    id="finalWidthPlusButton"
-                                    className="button"
-                                    onClick={() =>
-                                        dispatch(setGridColumns(columns + 1))
-                                    }
-                                >
-                                    <FontAwesomeIcon icon={faPlus} />
-                                </button>
-                                <p id="finalWidthLabel">{columns}</p>
-                                <button
-                                    id="finalWidthMinusButton"
-                                    className="button"
-                                    onClick={() =>
-                                        dispatch(setGridColumns(columns - 1))
-                                    }
-                                >
-                                    <FontAwesomeIcon icon={faMinus} />
-                                </button>
-                            </div>
-                            <div>
-                                <p>Height</p>
-                                <button
-                                    id="finalHeightPlusButton"
-                                    className="button"
-                                    onClick={() =>
-                                        dispatch(setGridRows(rows + 1))
-                                    }
-                                >
-                                    <FontAwesomeIcon icon={faPlus} />
-                                </button>
-                                <p id="finalHeightLabel">{rows}</p>
-                                <button
-                                    id="finalHeightMinusButton"
-                                    className="button"
-                                    onClick={() =>
-                                        dispatch(setGridRows(rows - 1))
-                                    }
-                                >
-                                    <FontAwesomeIcon icon={faMinus} />
-                                </button>
-                            </div>
-                        </div>
+                {overlayScale < 2 && (
+                    <div className="button-div">
+                        <button
+                            id="regenerateButton"
+                            className="button"
+                            onClick={async () => {
+                                newLevel(dispatch, rows, columns, 300, true);
+
+                                closeOverlay(
+                                    setOverlayHiding,
+                                    setOverlayVisible
+                                );
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={faArrowRotateRight}
+                                size="xs"
+                            />{" "}
+                            New Game!
+                        </button>
+                    </div>
+                )}
+                {(gameState === GameState.Paused ||
+                    gameState === GameState.Waiting) &&
+                    overlayScale === 0 && (
                         <div className="button-div">
                             <button
-                                id="regenerateButton"
-                                className="button"
-                                onClick={async () => {
-                                    dispatch(setOverlayVisible(false));
-                                    let solvedGrid = await newLevel(dispatch, rows, columns, true);
-                                    await sleep(1300);
-                                    randomizeTiles(dispatch, solvedGrid);
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faArrowRotateRight} /> Play
-                                again!
-                            </button>
-                        </div>
-                        <div className="button-div">
-                            <button id="shareButton" className="button">
-                                <FontAwesomeIcon icon={faShareNodes} />
-                            </button>
-                            <button id="viewButton" className="button" onClick={() => dispatch(setOverlayVisible(false))}>
-                                <FontAwesomeIcon icon={faEye} />
-                            </button>
-                            <button id="homeButton" className="button" onClick={async () => {
-                                setPageTransition("fade-out");
-
-                                await sleep(500);
-
-                                navigate('/');
-                            }}>
-                                <FontAwesomeIcon icon={faHouse} />
-                            </button>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className="button-div">
-                            <button
-                                id="pauseResumeButton"
+                                id="pauseSolutionButton"
                                 className="button"
                                 onClick={() => {
-                                    dispatch(setOverlayVisible(false));
+                                    solveGame(600);
+                                    closeOverlay(
+                                        setOverlayHiding,
+                                        setOverlayVisible
+                                    );
                                 }}
                             >
-                                <FontAwesomeIcon icon={faPlay} size="xs"/> Back to Game
+                                <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
+                                Show solution
                             </button>
                         </div>
-                        <div className="button-div">
-                            <button id="pauseSolutionButton" className="button" onClick={async () => {
-                                dispatch(setOverlayVisible(false));
-                                dispatch(setTimerRunning(false));
-                                dispatch(setGridSwappable(false));
-                                dispatch(setGameFinished(true));
-                                dispatch(setGameWon(false));
-                                dispatch(setHeaderButtonsEnabled(false));
-
-                                await sleep(600);
-
-                                dispatch(setTileTransition("shrink"));
-
-                                await(sleep(800));
-
-                                dispatch(setOriginalGridLayout({rows: originalGrid.rows, columns: originalGrid.columns, tiles: solvedGrid}));
-
-                                dispatch(setTileTransition("full"));
-
-                                await(sleep(500));
-
-                                dispatch(setTileTransition(""));
-                                dispatch(setHeaderButtonsEnabled(true));
-                            }}>
-                                <FontAwesomeIcon icon={faEye} size="xs"/> Show solution
-                            </button>
-                        </div>
-                        <div className="button-div">
-                            <button id="pauseHomeButton" className="button" onClick={async () => {
-                                dispatch(setOverlayVisible(false));
-                                setPageTransition("fade-out");
-
-                                await sleep(500);
-
-                                navigate('/');
-                            }}>
-                                <FontAwesomeIcon icon={faHouse} size="xs"/> Go Home
-                            </button>
-                        </div>
-                    </>
+                    )}
+                {gameState === GameState.Won && overlayScale === 0 && (
+                    <div className="button-div">
+                        <button id="shareButton" className="button">
+                            <FontAwesomeIcon icon={faShareNodes} /> Share!
+                        </button>
+                    </div>
                 )}
+                <div className="button-div">
+                    <button
+                        id="viewButton"
+                        className="button"
+                        onClick={() =>
+                            closeOverlay(setOverlayHiding, setOverlayVisible)
+                        }
+                    >
+                        <FontAwesomeIcon icon={faRectangleXmark} size="lg" />
+                    </button>
+                    {(gameState === GameState.Paused ||
+                        gameState === GameState.Waiting) &&
+                        overlayScale > 0 && (
+                            <button
+                                className="button"
+                                onClick={() => {
+                                    solveGame(600);
+                                    closeOverlay(
+                                        setOverlayHiding,
+                                        setOverlayVisible
+                                    );
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faLightbulb} size="xs" />
+                            </button>
+                        )}
+                    {gameState === GameState.Won && overlayScale > 1 && (
+                        <button className="button">
+                            <FontAwesomeIcon icon={faShareNodes} />
+                        </button>
+                    )}
+                    {overlayScale === 2 && (
+                        <button
+                            className="button"
+                            onClick={async () => {
+                                newLevel(dispatch, rows, columns, 300, true);
+
+                                closeOverlay(
+                                    setOverlayHiding,
+                                    setOverlayVisible
+                                );
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={faArrowRotateRight}
+                                size="xs"
+                            />
+                        </button>
+                    )}
+                    <button
+                        id="homeButton"
+                        className="button"
+                        onClick={async () => {
+                            closeOverlay(setOverlayHiding, setOverlayVisible);
+                            setPageTransition("fade-out");
+
+                            await sleep(500);
+
+                            navigate("/");
+                        }}
+                    >
+                        <FontAwesomeIcon icon={faHouse} />
+                    </button>
+                </div>
             </div>
         </div>
     );

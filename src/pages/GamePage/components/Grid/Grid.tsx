@@ -1,26 +1,17 @@
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { clamp, sleep } from "../../../../helpers";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swapy } from "swapy";
 import { createSwapy } from "swapy";
 import "./grid.css";
-import {
-    incrementGameSwaps,
-    incrementTimer,
-    setGameFinished,
-    setGameWon,
-    setHeaderButtonsEnabled,
-    setOverlayVisible,
-    setTimerRunning,
-} from "../../gameSlice";
-import { setGridSwappable } from "./gridSlice";
 import JSConfetti from "js-confetti";
+import { GameState, setGameState } from "../../gameSlice";
 
 export type GridLayout = {
     rows: number;
     columns: number;
     tiles: Tile[];
-}
+};
 
 export type Tile = {
     tileColor: string;
@@ -29,13 +20,19 @@ export type Tile = {
 
 const jsConfetti = new JSConfetti();
 
+interface Props {
+    incrementSwaps: () => void;
+    setOverlayVisible: (state: boolean) => void;
+}
+
 function evaluateGrid(
     solvedGridLayout: Tile[],
     internalGridLayout: String[]
 ): boolean {
     for (var i = 0; i < solvedGridLayout.length; i++) {
         if (
-            !solvedGridLayout[i].fixed && solvedGridLayout[i].tileColor !== internalGridLayout[i]
+            !solvedGridLayout[i].fixed &&
+            solvedGridLayout[i].tileColor !== internalGridLayout[i]
         ) {
             return false;
         }
@@ -44,24 +41,33 @@ function evaluateGrid(
     return true;
 }
 
-function Grid() {
+function Grid({ incrementSwaps, setOverlayVisible }: Props) {
     const dispatch = useAppDispatch();
 
-    const gridTransition = useAppSelector((state) => state.grid.value.gridTransition);
+    const gameState = useAppSelector((state) => state.game.value.gameState);
+
+    const gridTransition = useAppSelector(
+        (state) => state.grid.value.gridTransition
+    );
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
-    const tileTransition = useAppSelector((state) => state.grid.value.tileTransition);
+    const tileTransition = useAppSelector(
+        (state) => state.grid.value.tileTransition
+    );
     const originalLayout = useAppSelector(
         (state) => state.grid.value.originalLayout
     );
     const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
-    const swappable = useAppSelector((state) => state.grid.value.swappable);
-    const timerRunning = useAppSelector(
-        (state) => state.game.value.timerRunning
+
+    const [availableScreenWidth, setAvailableScreenWidth] = useState(
+        window.innerWidth - 40
+    );
+    const [availableScreenHeight, setAvailableScreenHeight] = useState(
+        window.innerHeight - 120
     );
 
-    const tileWidth = clamp((window.innerWidth - 40) / columns, 0, 100);
-    const tileHeight = clamp((window.innerHeight - 120) / rows, 0, 100);
+    const tileWidth = clamp(availableScreenWidth / columns, 0, 100);
+    const tileHeight = clamp(availableScreenHeight / rows, 0, 100);
 
     const dotSize = (tileWidth / 10 + tileHeight / 10) / 2;
 
@@ -69,55 +75,66 @@ function Grid() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const timer = setInterval(function () {
-            if (timerRunning) {
-                dispatch(incrementTimer());
-            }
-        }, 1000);
-
         if (containerRef.current) {
             swapyRef.current = createSwapy(containerRef.current, {
                 swapMode: "drop",
             });
-
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
                 // Return true to allow swapping, and return false to prevent swapping.
-                return swappable;
+                return (
+                    gameState === GameState.Playing ||
+                    gameState === GameState.Waiting
+                );
             });
             swapyRef.current.onSwap(() => {
-                dispatch(incrementGameSwaps());
+                incrementSwaps();
             });
             swapyRef.current.onSwapEnd(async () => {
-                const slotMap = swapyRef.current?.slotItemMap().asObject
-
-                const internalLayout = [] as string[]
-
-                if(slotMap) {
-                    Object.keys(slotMap).map((key) => internalLayout[parseInt(key)] = slotMap[key])
+                if (gameState === GameState.Waiting) {
+                    dispatch(setGameState(GameState.Playing));
                 }
-                
+
+                const slotMap = swapyRef.current?.slotItemMap().asObject;
+
+                const internalLayout = [] as string[];
+
+                if (slotMap) {
+                    Object.keys(slotMap).map(
+                        (key) => (internalLayout[parseInt(key)] = slotMap[key])
+                    );
+                }
+
                 if (evaluateGrid(solvedGrid, internalLayout)) {
-                    dispatch(setHeaderButtonsEnabled(false));
-                    dispatch(setGameFinished(true));
-                    dispatch(setGameWon(true));
-                    dispatch(setTimerRunning(false));
-                    dispatch(setGridSwappable(false));
+                    dispatch(setGameState(GameState.Won));
 
                     jsConfetti.addConfetti();
 
                     await sleep(1800);
 
-                    dispatch(setOverlayVisible(true));
+                    setOverlayVisible(true);
                 }
             });
         }
         return () => {
             swapyRef.current?.destroy();
-
-            clearInterval(timer);
         };
     });
+
+    useEffect(() => {
+        function handleResize() {
+            setAvailableScreenWidth(window.innerWidth - 40);
+            setAvailableScreenHeight(window.innerHeight - 120);
+        }
+
+        // Attach the event listener to the window object
+        window.addEventListener("resize", handleResize);
+
+        // Remove the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     return (
         <div
@@ -149,13 +166,15 @@ function Grid() {
                                     }}
                                     data-swapy-item={i.tileColor}
                                 >
-                                    {!swappable && (
+                                    {!(
+                                        gameState === GameState.Playing ||
+                                        gameState === GameState.Waiting
+                                    ) && (
                                         <div
                                             key={`swapPreventionDiv${index}`}
                                             data-swapy-no-drag
                                             style={{
-                                                backgroundColor:
-                                                    i.tileColor,
+                                                backgroundColor: i.tileColor,
                                                 width: tileWidth,
                                                 height: tileHeight,
                                             }}

@@ -9,13 +9,13 @@
     align-items: center;
     justify-content: center;
     opacity: 1;
-    transition: opacity 0.5s ease;
+    animation: fade-in 0.5s ease;
     z-index: 1000; /* Make sure overlay is above everything else */
 }
 
-.overlay.hidden {
+.overlay.hide {
+    animation: fade-out 0.5s ease;
     opacity: 0;
-    pointer-events: none; /* Prevent interaction when hidden */
 }
 
 .box {

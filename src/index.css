@@ -1,6 +1,6 @@
 @font-face {
-    font-family: 'Montserrat Variable';
-    src: url('./assets/fonts/Montserrat-VariableFont_wght.ttf');
+    font-family: "Montserrat Variable";
+    src: url("./assets/fonts/Montserrat-VariableFont_wght.ttf");
     font-weight: sans-serif;
     font-style: normal;
 }
@@ -35,12 +35,12 @@ body {
 }
 
 .fade-in {
-    animation: fade-in .5s ease;
+    animation: fade-in 0.5s ease;
     opacity: 1;
 }
 
 .fade-out {
-    animation: fade-out .5s ease;
+    animation: fade-out 0.5s ease;
     opacity: 0;
 }
 

@@ -2,35 +2,28 @@ const colorSimilarityThreshold = 25;
 
 import { sleep } from "../../helpers";
 import { AppDispatch } from "../../store";
-import type { GridLayout, Tile } from "./components/Grid/Grid";
+import type { Tile } from "./components/Grid/Grid";
 import {
-    setGridSwappable,
     setGridTransition,
     setOriginalGridLayout,
     setSolvedGridLayout,
     setTileTransition,
 } from "./components/Grid/gridSlice";
-import {
-    setGameFinished,
-    setGameWon,
-    setHeaderButtonsEnabled,
-} from "./gameSlice";
+import { GameState, setGameState } from "./gameSlice";
 
 export async function newLevel(
     dispatch: AppDispatch,
     rows: number,
     columns: number,
-    regenerate: boolean
-) : Promise<GridLayout> {
-    dispatch(setGameFinished(false));
-    dispatch(setGameWon(false));
-    dispatch(setGridSwappable(false));
-    dispatch(setHeaderButtonsEnabled(false));
+    tileTransitionDelay: number,
+    fadeGrid: boolean,
+) {
+    dispatch(setGameState(GameState.Generating));
 
-    if (regenerate) {
+    if (fadeGrid) {
         dispatch(setGridTransition("fade-out"));
 
-        await sleep(500);
+        await sleep(600);
     }
 
     const tileList = generateNewTileList(columns, rows);
@@ -45,14 +38,14 @@ export async function newLevel(
 
     dispatch(setSolvedGridLayout(tileList));
 
-    if (regenerate) {
+    if (fadeGrid) {
         dispatch(setGridTransition("fade-in"));
+
+        await sleep(500);
     }
 
-    return(solvedGrid);
-}
+    await sleep(tileTransitionDelay);
 
-export async function randomizeTiles(dispatch: AppDispatch, solvedGrid: GridLayout) {
     dispatch(setTileTransition("shrink"));
 
     await sleep(800);
@@ -72,8 +65,7 @@ export async function randomizeTiles(dispatch: AppDispatch, solvedGrid: GridLayo
     await sleep(700);
 
     dispatch(setTileTransition(""));
-    dispatch(setGridSwappable(true));
-    dispatch(setHeaderButtonsEnabled(true));
+    dispatch(setGameState(GameState.Waiting));
 }
 
 function randomizeTileList(grid: Tile[]) {
@@ -96,10 +88,7 @@ function randomizeTileList(grid: Tile[]) {
     return randomGrid;
 }
 
-function generateNewTileList(
-    gridWidth: number,
-    gridHeight: number,
-): Tile[] {
+function generateNewTileList(gridWidth: number, gridHeight: number): Tile[] {
     const cornerColors = generateCornerColors();
 
     let colorGrid = generateGradientGrid(cornerColors, gridWidth, gridHeight);
