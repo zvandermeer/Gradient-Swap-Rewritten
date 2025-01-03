@@ -16,11 +16,18 @@ import {
 import { useEffect, useState } from "react";
 import { GameState } from "../../gameSlice";
 import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
+import { AppDispatch } from "../../../../store";
+import { GridLayout, Tile } from "../Grid/Grid";
 
 interface Props {
     setPageTransition: (state: string) => void;
     setOverlayVisible: (state: boolean) => void;
-    solveGame: (solveDelay: number) => void;
+    solveGame: (
+        solveDelay: number,
+        dispatch: AppDispatch,
+        originalGrid: GridLayout,
+        solvedGrid: Tile[]
+    ) => void;
 }
 
 async function closeOverlay(
@@ -54,6 +61,8 @@ function PauseOverlay({
     );
     const swaps = useAppSelector((state) => state.game.value.swaps);
     const timer = useAppSelector((state) => state.game.value.timer);
+    const originalGrid = useAppSelector((state) => state.grid.value.originalLayout);
+    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
 
     const [overlayHiding, setOverlayHiding] = useState(false);
     const [overlayHeader, setOverlayHeader] = useState("");
@@ -194,7 +203,7 @@ function PauseOverlay({
                                 id="pauseSolutionButton"
                                 className="button"
                                 onClick={() => {
-                                    solveGame(600);
+                                    solveGame(600, dispatch, originalGrid, solvedGrid);
                                     closeOverlay(
                                         setOverlayHiding,
                                         setOverlayVisible
@@ -229,7 +238,7 @@ function PauseOverlay({
                             <button
                                 className="button"
                                 onClick={() => {
-                                    solveGame(600);
+                                    solveGame(600, dispatch, originalGrid, solvedGrid);
                                     closeOverlay(
                                         setOverlayHiding,
                                         setOverlayVisible

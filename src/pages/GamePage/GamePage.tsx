@@ -1,9 +1,9 @@
-import Grid from "./components/Grid/Grid";
+import Grid, { GridLayout, Tile } from "./components/Grid/Grid";
 import GameHeader from "./components/GameHeader/GameHeader";
 import "./gamePage.css";
 import { useEffect, useState } from "react";
 import { sleep } from "../../helpers";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../hooks";
 import { useNavigate } from "react-router";
 import PauseOverlay from "./components/PauseOverlay/PauseOverlay";
 import { GameState, setGameState } from "./gameSlice";
@@ -11,15 +11,9 @@ import {
     setOriginalGridLayout,
     setTileTransition,
 } from "./components/Grid/gridSlice";
+import { AppDispatch } from "../../store";
 
-async function solveGame(solveDelay: number) {
-    const dispatch = useAppDispatch();
-
-    const originalGrid = useAppSelector(
-        (state) => state.grid.value.originalLayout
-    );
-    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
-
+async function solveGame(solveDelay: number, dispatch: AppDispatch, originalGrid: GridLayout, solvedGrid: Tile[]) {
     await sleep(solveDelay);
 
     dispatch(setTileTransition("shrink"));
