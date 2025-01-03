@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
 import { GameState, incrementTimer, setGameState } from "../../gameSlice";
 import { useEffect } from "react";
+import { booleanSetterType } from "../../../../helpers";
 
 interface Props {
-    setGridLoaded: (state: boolean) => void;
-    setOverlayVisible: (state: boolean) => void;
+    setGridLoaded: booleanSetterType;
+    setOverlayVisible: booleanSetterType;
     overlayVisible: boolean;
 }
 
