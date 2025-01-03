@@ -14,7 +14,7 @@ import {
     faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { GameState } from "../../gameSlice";
+import { GameState, setGameState } from "../../gameSlice";
 import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
 import { AppDispatch } from "../../../../store";
 import { GridLayout, Tile } from "../Grid/Grid";
@@ -34,11 +34,17 @@ interface Props {
 
 async function closeOverlay(
     setOverlayHiding: (state: boolean) => void,
-    setOverlayVisible: (state: boolean) => void
+    setOverlayVisible: (state: boolean) => void,
+    dispatch: AppDispatch,
+    gameState: GameState,
 ) {
     setOverlayHiding(true);
 
     await sleep(500);
+
+    if(gameState === GameState.Paused) {
+        dispatch(setGameState(GameState.Playing));
+    }
 
     setOverlayVisible(false);
 }
@@ -190,7 +196,9 @@ function PauseOverlay({
 
                                 closeOverlay(
                                     setOverlayHiding,
-                                    setOverlayVisible
+                                    setOverlayVisible,
+                                    dispatch,
+                                    gameState,
                                 );
                             }}
                         >
@@ -218,7 +226,9 @@ function PauseOverlay({
                                     );
                                     closeOverlay(
                                         setOverlayHiding,
-                                        setOverlayVisible
+                                        setOverlayVisible,
+                                        dispatch,
+                                        gameState
                                     );
                                 }}
                             >
@@ -238,7 +248,7 @@ function PauseOverlay({
                     <button
                         className="button"
                         onClick={() =>
-                            closeOverlay(setOverlayHiding, setOverlayVisible)
+                            closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState)
                         }
                     >
                         <FontAwesomeIcon icon={faRectangleXmark} size="lg" />
@@ -258,7 +268,9 @@ function PauseOverlay({
                                     );
                                     closeOverlay(
                                         setOverlayHiding,
-                                        setOverlayVisible
+                                        setOverlayVisible,
+                                        dispatch,
+                                        gameState
                                     );
                                 }}
                             >
@@ -285,7 +297,9 @@ function PauseOverlay({
 
                                 closeOverlay(
                                     setOverlayHiding,
-                                    setOverlayVisible
+                                    setOverlayVisible,
+                                    dispatch,
+                                    gameState
                                 );
                             }}
                         >
@@ -298,7 +312,7 @@ function PauseOverlay({
                     <button
                         className="button"
                         onClick={async () => {
-                            closeOverlay(setOverlayHiding, setOverlayVisible);
+                            closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
                             setPageTransition("fade-out");
 
                             await sleep(500);
