@@ -17,6 +17,8 @@ export const gameSlice = createSlice({
         value: {
             gameState: GameState.Home,
             statsEnabled: true,
+            swaps: 0,
+            timer: 0,
         },
     },
     reducers: {
@@ -25,12 +27,29 @@ export const gameSlice = createSlice({
         },
         setStatsEnabled: (state, action: PayloadAction<boolean>) => {
             state.value.statsEnabled = action.payload;
-        }
+        },
+        resetTimer: (state) => {
+            state.value.timer = 0;
+        },
+        incrementTimer: (state) => {
+            state.value.timer += 1;
+        },
+        resetSwaps: (state) => {
+            state.value.swaps = 0;
+        },
+        incrementSwaps: (state) => {
+            state.value.swaps += 1;
+        },
     },
 });
 
 export const {
     setGameState,
+    setStatsEnabled,
+    resetTimer,
+    incrementTimer,
+    resetSwaps,
+    incrementSwaps,
 } = gameSlice.actions;
 
 export const selectGrid = (state: RootState) => state.grid.value;

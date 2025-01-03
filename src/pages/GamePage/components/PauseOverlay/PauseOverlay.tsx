@@ -16,13 +16,20 @@ import {
 import { useEffect, useState } from "react";
 import { GameState } from "../../gameSlice";
 import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
+import { AppDispatch } from "../../../../store";
+import { GridLayout, Tile } from "../Grid/Grid";
 
 interface Props {
+    setGridLoaded: (state: boolean) => void;
     setPageTransition: (state: string) => void;
     setOverlayVisible: (state: boolean) => void;
-    solveGame: (solveDelay: number) => void;
-    timer: number;
-    swaps: number;
+    solveGame: (
+        solveDelay: number,
+        dispatch: AppDispatch,
+        originalGrid: GridLayout,
+        solvedGrid: Tile[],
+        setGridLoaded: (state: boolean) => void
+    ) => void;
 }
 
 async function closeOverlay(
@@ -37,11 +44,10 @@ async function closeOverlay(
 }
 
 function PauseOverlay({
+    setGridLoaded,
     setPageTransition,
     setOverlayVisible,
     solveGame,
-    timer,
-    swaps,
 }: Props) {
     let navigate = useNavigate();
 
@@ -56,6 +62,12 @@ function PauseOverlay({
     const statsEnabled = useAppSelector(
         (state) => state.game.value.statsEnabled
     );
+    const swaps = useAppSelector((state) => state.game.value.swaps);
+    const timer = useAppSelector((state) => state.game.value.timer);
+    const originalGrid = useAppSelector(
+        (state) => state.grid.value.originalLayout
+    );
+    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
 
     const [overlayHiding, setOverlayHiding] = useState(false);
     const [overlayHeader, setOverlayHeader] = useState("");
@@ -172,7 +184,14 @@ function PauseOverlay({
                             id="regenerateButton"
                             className="button"
                             onClick={async () => {
-                                newLevel(dispatch, rows, columns, 300, true);
+                                newLevel(
+                                    dispatch,
+                                    rows,
+                                    columns,
+                                    300,
+                                    true,
+                                    setGridLoaded
+                                );
 
                                 closeOverlay(
                                     setOverlayHiding,
@@ -196,7 +215,13 @@ function PauseOverlay({
                                 id="pauseSolutionButton"
                                 className="button"
                                 onClick={() => {
-                                    solveGame(600);
+                                    solveGame(
+                                        600,
+                                        dispatch,
+                                        originalGrid,
+                                        solvedGrid,
+                                        setGridLoaded
+                                    );
                                     closeOverlay(
                                         setOverlayHiding,
                                         setOverlayVisible
@@ -231,7 +256,13 @@ function PauseOverlay({
                             <button
                                 className="button"
                                 onClick={() => {
-                                    solveGame(600);
+                                    solveGame(
+                                        600,
+                                        dispatch,
+                                        originalGrid,
+                                        solvedGrid,
+                                        setGridLoaded
+                                    );
                                     closeOverlay(
                                         setOverlayHiding,
                                         setOverlayVisible
@@ -250,7 +281,14 @@ function PauseOverlay({
                         <button
                             className="button"
                             onClick={async () => {
-                                newLevel(dispatch, rows, columns, 300, true);
+                                newLevel(
+                                    dispatch,
+                                    rows,
+                                    columns,
+                                    300,
+                                    true,
+                                    setGridLoaded
+                                );
 
                                 closeOverlay(
                                     setOverlayHiding,

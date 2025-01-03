@@ -1,9 +1,9 @@
-import Grid from "./components/Grid/Grid";
+import Grid, { GridLayout, Tile } from "./components/Grid/Grid";
 import GameHeader from "./components/GameHeader/GameHeader";
 import "./gamePage.css";
 import { useEffect, useState } from "react";
 import { sleep } from "../../helpers";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../hooks";
 import { useNavigate } from "react-router";
 import PauseOverlay from "./components/PauseOverlay/PauseOverlay";
 import { GameState, setGameState } from "./gameSlice";
@@ -11,20 +11,22 @@ import {
     setOriginalGridLayout,
     setTileTransition,
 } from "./components/Grid/gridSlice";
+import { AppDispatch } from "../../store";
 
-async function solveGame(solveDelay: number) {
-    const dispatch = useAppDispatch();
-
-    const originalGrid = useAppSelector(
-        (state) => state.grid.value.originalLayout
-    );
-    const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
-
+async function solveGame(
+    solveDelay: number,
+    dispatch: AppDispatch,
+    originalGrid: GridLayout,
+    solvedGrid: Tile[],
+    setGridLoaded: (state: boolean) => void
+) {
     await sleep(solveDelay);
 
     dispatch(setTileTransition("shrink"));
 
-    await sleep(800);
+    await sleep(500);
+
+    setGridLoaded(false);
 
     dispatch(
         setOriginalGridLayout({
@@ -33,6 +35,10 @@ async function solveGame(solveDelay: number) {
             tiles: solvedGrid,
         })
     );
+
+    await sleep(300);
+
+    setGridLoaded(true);
 
     dispatch(setTileTransition("full"));
 
@@ -48,24 +54,10 @@ function GamePage() {
     const originalGrid = useAppSelector(
         (state) => state.grid.value.originalLayout
     );
-    const gameState = useAppSelector((state) => state.game.value.gameState);
 
     const [pageTransition, setPageTransition] = useState("fade-in");
-    const [swaps, setSwaps] = useState(0);
-    const [timer, setTimer] = useState(0);
     const [overlayVisible, setOverlayVisible] = useState(false);
-
-    useEffect(() => {
-        const timerFunc = setInterval(function () {
-            if (gameState === GameState.Playing) {
-                setTimer(timer + 1);
-            }
-        }, 1000);
-
-        return () => {
-            clearInterval(timerFunc);
-        };
-    });
+    const [gridLoaded, setGridLoaded] = useState(true);
 
     useEffect(() => {
         const run = async () => {
@@ -79,7 +71,7 @@ function GamePage() {
             }
         };
         run();
-    }, [])
+    }, []);
 
     return (
         <>
@@ -89,14 +81,11 @@ function GamePage() {
                         <GameHeader
                             setOverlayVisible={setOverlayVisible}
                             overlayVisible={overlayVisible}
-                            swaps={swaps}
-                            timer={timer}
+                            setGridLoaded={setGridLoaded}
                         />
                         <Grid
-                            incrementSwaps={() => {
-                                setSwaps(swaps + 1);
-                            }}
                             setOverlayVisible={setOverlayVisible}
+                            gridLoaded={gridLoaded}
                         />
                     </div>
                     {overlayVisible && (
@@ -104,8 +93,7 @@ function GamePage() {
                             setPageTransition={setPageTransition}
                             setOverlayVisible={setOverlayVisible}
                             solveGame={solveGame}
-                            timer={timer}
-                            swaps={swaps}
+                            setGridLoaded={setGridLoaded}
                         />
                     )}
                 </>

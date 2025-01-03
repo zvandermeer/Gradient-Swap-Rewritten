@@ -3,27 +3,42 @@ import "./gameHeader.css";
 import { newLevel } from "../../generation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
-import { GameState, setGameState } from "../../gameSlice";
+import { GameState, incrementTimer, setGameState } from "../../gameSlice";
+import { useEffect } from "react";
 
 interface Props {
+    setGridLoaded: (state: boolean) => void;
     setOverlayVisible: (state: boolean) => void;
     overlayVisible: boolean;
-    swaps: number;
-    timer: number;
 }
 
 function GameHeader({
+    setGridLoaded,
     setOverlayVisible,
     overlayVisible,
-    swaps,
-    timer,
 }: Props) {
     const dispatch = useAppDispatch();
 
     const rows = useAppSelector((state) => state.grid.value.rows);
     const columns = useAppSelector((state) => state.grid.value.columns);
     const gameState = useAppSelector((state) => state.game.value.gameState);
-    const statsEnabled = useAppSelector((state) => state.game.value.statsEnabled);
+    const statsEnabled = useAppSelector(
+        (state) => state.game.value.statsEnabled
+    );
+    const swaps = useAppSelector((state) => state.game.value.swaps);
+    const timer = useAppSelector((state) => state.game.value.timer);
+
+    useEffect(() => {
+        const x = setInterval(function () {
+            if (gameState === GameState.Playing) {
+                dispatch(incrementTimer());
+            }
+        }, 1000);
+
+        return () => {
+            clearInterval(x);
+        };
+    }, [gameState]);
 
     return (
         <div id="controls">
@@ -36,7 +51,7 @@ function GameHeader({
                             !overlayVisible &&
                             gameState !== GameState.Generating
                         ) {
-                            if (gameState === GameState.Playing ) {
+                            if (gameState === GameState.Playing) {
                                 dispatch(setGameState(GameState.Paused));
                             }
                             setOverlayVisible(true);
@@ -51,7 +66,14 @@ function GameHeader({
                             !overlayVisible &&
                             gameState !== GameState.Generating
                         ) {
-                            newLevel(dispatch, rows, columns, 300, true);
+                            newLevel(
+                                dispatch,
+                                rows,
+                                columns,
+                                300,
+                                true,
+                                setGridLoaded
+                            );
                         }
                     }}
                     id="header-restart"

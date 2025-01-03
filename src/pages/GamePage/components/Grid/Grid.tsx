@@ -5,7 +5,7 @@ import { Swapy } from "swapy";
 import { createSwapy } from "swapy";
 import "./grid.css";
 import JSConfetti from "js-confetti";
-import { GameState, setGameState } from "../../gameSlice";
+import { GameState, incrementSwaps, setGameState } from "../../gameSlice";
 
 export type GridLayout = {
     rows: number;
@@ -21,8 +21,8 @@ export type Tile = {
 const jsConfetti = new JSConfetti();
 
 interface Props {
-    incrementSwaps: () => void;
     setOverlayVisible: (state: boolean) => void;
+    gridLoaded: boolean;
 }
 
 function evaluateGrid(
@@ -41,7 +41,7 @@ function evaluateGrid(
     return true;
 }
 
-function Grid({ incrementSwaps, setOverlayVisible }: Props) {
+function Grid({ setOverlayVisible, gridLoaded }: Props) {
     const dispatch = useAppDispatch();
 
     const gameState = useAppSelector((state) => state.game.value.gameState);
@@ -49,8 +49,6 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
     const gridTransition = useAppSelector(
         (state) => state.grid.value.gridTransition
     );
-    const rows = useAppSelector((state) => state.grid.value.rows);
-    const columns = useAppSelector((state) => state.grid.value.columns);
     const tileTransition = useAppSelector(
         (state) => state.grid.value.tileTransition
     );
@@ -66,12 +64,21 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
         window.innerHeight - 120
     );
 
-    const tileWidth = clamp(availableScreenWidth / columns, 0, 100);
-    const tileHeight = clamp(availableScreenHeight / rows, 0, 100);
+    const tileWidth = clamp(
+        availableScreenWidth / originalLayout.columns,
+        0,
+        100
+    );
+    const tileHeight = clamp(
+        availableScreenHeight / originalLayout.rows,
+        0,
+        100
+    );
 
     const dotSize = (tileWidth / 10 + tileHeight / 10) / 2;
 
     const swapyRef = useRef<Swapy | null>(null);
+
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -88,7 +95,7 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
                 );
             });
             swapyRef.current.onSwap(() => {
-                incrementSwaps();
+                dispatch(incrementSwaps());
             });
             swapyRef.current.onSwapEnd(async () => {
                 if (gameState === GameState.Waiting) {
@@ -119,7 +126,7 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
         return () => {
             swapyRef.current?.destroy();
         };
-    });
+    }, [gameState]);
 
     useEffect(() => {
         function handleResize() {
@@ -152,36 +159,42 @@ function Grid({ incrementSwaps, setOverlayVisible }: Props) {
                 return (
                     <>
                         {!i.fixed ? (
-                            <div
-                                key={`tileDrop${index}`}
-                                data-swapy-slot={index}
-                            >
-                                <div
-                                    key={`tile${index}`}
-                                    className={"tile " + tileTransition}
-                                    style={{
-                                        backgroundColor: i.tileColor,
-                                        width: tileWidth,
-                                        height: tileHeight,
-                                    }}
-                                    data-swapy-item={i.tileColor}
-                                >
-                                    {!(
-                                        gameState === GameState.Playing ||
-                                        gameState === GameState.Waiting
-                                    ) && (
+                            <>
+                                {gridLoaded && (
+                                    <div
+                                        key={`tileDrop${index}`}
+                                        data-swapy-slot={index}
+                                    >
                                         <div
-                                            key={`swapPreventionDiv${index}`}
-                                            data-swapy-no-drag
+                                            key={`tile${index}`}
+                                            className={"tile " + tileTransition}
                                             style={{
                                                 backgroundColor: i.tileColor,
                                                 width: tileWidth,
                                                 height: tileHeight,
                                             }}
-                                        ></div>
-                                    )}
-                                </div>
-                            </div>
+                                            data-swapy-item={i.tileColor}
+                                        >
+                                            {!(
+                                                gameState ===
+                                                    GameState.Playing ||
+                                                gameState === GameState.Waiting
+                                            ) && (
+                                                <div
+                                                    key={`swapPreventionDiv${index}`}
+                                                    data-swapy-no-drag
+                                                    style={{
+                                                        backgroundColor:
+                                                            i.tileColor,
+                                                        width: tileWidth,
+                                                        height: tileHeight,
+                                                    }}
+                                                ></div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div
                                 key={`fixedTile${index}`}
