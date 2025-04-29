@@ -38,13 +38,13 @@ async function closeOverlay(
     setOverlayHiding: booleanSetterType,
     setOverlayVisible: booleanSetterType,
     dispatch: AppDispatch,
-    gameState: GameState
+    shouldResume: boolean
 ) {
     setOverlayHiding(true);
 
     await sleep(500);
 
-    if (gameState === GameState.Paused) {
+    if (shouldResume) {
         dispatch(setGameState(GameState.Playing));
     }
 
@@ -58,11 +58,10 @@ function createButton(
     setGridLoaded: booleanSetterType,
     setOverlayHiding: booleanSetterType,
     setOverlayVisible: booleanSetterType,
-    gameState: GameState
 ) {
     newLevel(dispatch, rows, columns, 300, true, setGridLoaded);
 
-    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, false);
 }
 
 function solveButton(
@@ -72,11 +71,10 @@ function solveButton(
     solvedGrid: Tile[],
     setGridLoaded: booleanSetterType,
     setOverlayHiding: booleanSetterType,
-    setOverlayVisible: booleanSetterType,
-    gameState: GameState
+    setOverlayVisible: booleanSetterType
 ) {
     solveGame(600, dispatch, originalGrid, solvedGrid, setGridLoaded);
-    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, false);
 }
 
 async function shareButton(
@@ -234,8 +232,7 @@ function PauseOverlay({
                                     columns,
                                     setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible,
-                                    gameState
+                                    setOverlayVisible
                                 )
                             }
                         >
@@ -261,8 +258,7 @@ function PauseOverlay({
                                         solvedGrid,
                                         setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible,
-                                        gameState
+                                        setOverlayVisible
                                     )
                                 }
                             >
@@ -292,7 +288,7 @@ function PauseOverlay({
                                 setOverlayHiding,
                                 setOverlayVisible,
                                 dispatch,
-                                gameState
+                                true
                             )
                         }
                     >
@@ -311,8 +307,7 @@ function PauseOverlay({
                                         solvedGrid,
                                         setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible,
-                                        gameState
+                                        setOverlayVisible
                                     );
                                 }}
                             >
@@ -339,8 +334,7 @@ function PauseOverlay({
                                     columns,
                                     setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible,
-                                    gameState
+                                    setOverlayVisible
                                 )
                             }
                         >
@@ -357,7 +351,7 @@ function PauseOverlay({
                                 setOverlayHiding,
                                 setOverlayVisible,
                                 dispatch,
-                                gameState
+                                false
                             );
                             setPageTransition("fade-out");
 

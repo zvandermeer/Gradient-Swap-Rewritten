@@ -9,7 +9,7 @@ import {
     setSolvedGridLayout,
     setTileTransition,
 } from "./components/Grid/gridSlice";
-import { GameState, setGameState } from "./gameSlice";
+import { GameState, resetSwaps, resetTimer, setGameState } from "./gameSlice";
 
 export async function newLevel(
     dispatch: AppDispatch,
@@ -20,6 +20,8 @@ export async function newLevel(
     setGridLoaded?: booleanSetterType
 ) {
     dispatch(setGameState(GameState.Generating));
+    dispatch(resetSwaps());
+    dispatch(resetTimer());
 
     if (fadeGrid && setGridLoaded) {
         dispatch(setGridTransition("fade-out"));
