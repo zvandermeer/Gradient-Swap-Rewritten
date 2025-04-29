@@ -85,6 +85,7 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
         if (containerRef.current) {
             swapyRef.current = createSwapy(containerRef.current, {
                 swapMode: "drop",
+                animationDuration: 180
             });
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
