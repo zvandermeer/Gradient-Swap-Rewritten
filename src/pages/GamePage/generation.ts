@@ -1,6 +1,6 @@
 const colorSimilarityThreshold = 25;
 
-import { sleep } from "../../helpers";
+import { booleanSetterType, sleep } from "../../helpers";
 import { AppDispatch } from "../../store";
 import type { Tile } from "./components/Grid/Grid";
 import {
@@ -17,7 +17,7 @@ export async function newLevel(
     columns: number,
     tileTransitionDelay: number,
     fadeGrid: boolean,
-    setGridLoaded?: (item: boolean) => void
+    setGridLoaded?: booleanSetterType
 ) {
     dispatch(setGameState(GameState.Generating));
 

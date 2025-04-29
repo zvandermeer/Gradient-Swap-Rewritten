@@ -2,7 +2,7 @@ import Grid, { GridLayout, Tile } from "./components/Grid/Grid";
 import GameHeader from "./components/GameHeader/GameHeader";
 import "./gamePage.css";
 import { useEffect, useState } from "react";
-import { sleep } from "../../helpers";
+import { booleanSetterType, sleep } from "../../helpers";
 import { useAppSelector } from "../../hooks";
 import { useNavigate } from "react-router";
 import PauseOverlay from "./components/PauseOverlay/PauseOverlay";
@@ -18,7 +18,7 @@ async function solveGame(
     dispatch: AppDispatch,
     originalGrid: GridLayout,
     solvedGrid: Tile[],
-    setGridLoaded: (state: boolean) => void
+    setGridLoaded: booleanSetterType
 ) {
     await sleep(solveDelay);
 

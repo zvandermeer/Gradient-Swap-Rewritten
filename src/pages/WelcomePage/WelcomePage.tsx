@@ -39,15 +39,13 @@ function WelcomePage() {
                 <div>Width</div>
                 <div className="dimension-button">
                     <button
-                        id="widthPlusButton"
                         className="button"
                         onClick={() => dispatch(setGridColumns(columns + 1))}
                     >
                         <FontAwesomeIcon icon={faPlus} />
                     </button>
-                    <p id="widthLabel">{columns}</p>
+                    <p>{columns}</p>
                     <button
-                        id="widthMinusButton"
                         className="button"
                         onClick={() => dispatch(setGridColumns(columns - 1))}
                     >
@@ -57,15 +55,13 @@ function WelcomePage() {
                 <div>Height</div>
                 <div className="dimension-button">
                     <button
-                        id="heightPlusButton"
                         className="button"
                         onClick={() => dispatch(setGridRows(rows + 1))}
                     >
                         <FontAwesomeIcon icon={faPlus} />
                     </button>
-                    <p id="heightLabel">{rows}</p>
+                    <p>{rows}</p>
                     <button
-                        id="heightMinusButton"
                         className="button"
                         onClick={() => dispatch(setGridRows(rows - 1))}
                     >

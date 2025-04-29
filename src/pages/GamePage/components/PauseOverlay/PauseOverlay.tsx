@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { sleep } from "../../../../helpers";
+import { booleanSetterType, sleep } from "../../../../helpers";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { newLevel } from "../../generation";
 import { setGridColumns, setGridRows } from "../Grid/gridSlice";
@@ -14,33 +14,82 @@ import {
     faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { GameState } from "../../gameSlice";
+import { GameState, setGameState } from "../../gameSlice";
 import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
 import { AppDispatch } from "../../../../store";
 import { GridLayout, Tile } from "../Grid/Grid";
 
+type solveGameFunc = (
+    solveDelay: number,
+    dispatch: AppDispatch,
+    originalGrid: GridLayout,
+    solvedGrid: Tile[],
+    setGridLoaded: booleanSetterType
+) => void;
+
 interface Props {
-    setGridLoaded: (state: boolean) => void;
+    setGridLoaded: booleanSetterType;
     setPageTransition: (state: string) => void;
-    setOverlayVisible: (state: boolean) => void;
-    solveGame: (
-        solveDelay: number,
-        dispatch: AppDispatch,
-        originalGrid: GridLayout,
-        solvedGrid: Tile[],
-        setGridLoaded: (state: boolean) => void
-    ) => void;
+    setOverlayVisible: booleanSetterType;
+    solveGame: solveGameFunc;
 }
 
 async function closeOverlay(
-    setOverlayHiding: (state: boolean) => void,
-    setOverlayVisible: (state: boolean) => void
+    setOverlayHiding: booleanSetterType,
+    setOverlayVisible: booleanSetterType,
+    dispatch: AppDispatch,
+    gameState: GameState
 ) {
     setOverlayHiding(true);
 
     await sleep(500);
 
+    if (gameState === GameState.Paused) {
+        dispatch(setGameState(GameState.Playing));
+    }
+
     setOverlayVisible(false);
+}
+
+function createButton(
+    dispatch: AppDispatch,
+    rows: number,
+    columns: number,
+    setGridLoaded: booleanSetterType,
+    setOverlayHiding: booleanSetterType,
+    setOverlayVisible: booleanSetterType,
+    gameState: GameState
+) {
+    newLevel(dispatch, rows, columns, 300, true, setGridLoaded);
+
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+}
+
+function solveButton(
+    dispatch: AppDispatch,
+    solveGame: solveGameFunc,
+    originalGrid: GridLayout,
+    solvedGrid: Tile[],
+    setGridLoaded: booleanSetterType,
+    setOverlayHiding: booleanSetterType,
+    setOverlayVisible: booleanSetterType,
+    gameState: GameState
+) {
+    solveGame(600, dispatch, originalGrid, solvedGrid, setGridLoaded);
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+}
+
+async function shareButton(
+    rows: number,
+    columns: number,
+    timer: number,
+    swaps: number
+) {
+    const shareData = {
+        text: `Gradient Game (${columns}x${rows})\nFinished in: ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, "0")}\nTotal swaps: ${swaps}\nPlay: https://gradient.starlightt.xyz`,
+    };
+
+    await navigator.share(shareData);
 }
 
 function PauseOverlay({
@@ -125,14 +174,14 @@ function PauseOverlay({
                     <div className="stats">
                         <div className="time">
                             <div>Time:</div>
-                            <div id="overlayTime">
+                            <div>
                                 {Math.floor(timer / 60)}:
                                 {(timer % 60).toString().padStart(2, "0")}
                             </div>
                         </div>
                         <div className="swaps">
                             <div>Swaps:</div>
-                            <div id="overlaySwaps">{swaps}</div>
+                            <div>{swaps}</div>
                         </div>
                     </div>
                 )}
@@ -140,7 +189,6 @@ function PauseOverlay({
                     <div>
                         <p>Width</p>
                         <button
-                            id="finalWidthPlusButton"
                             className="button"
                             onClick={() =>
                                 dispatch(setGridColumns(columns + 1))
@@ -148,9 +196,8 @@ function PauseOverlay({
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </button>
-                        <p id="finalWidthLabel">{columns}</p>
+                        <p>{columns}</p>
                         <button
-                            id="finalWidthMinusButton"
                             className="button"
                             onClick={() =>
                                 dispatch(setGridColumns(columns - 1))
@@ -162,15 +209,13 @@ function PauseOverlay({
                     <div>
                         <p>Height</p>
                         <button
-                            id="finalHeightPlusButton"
                             className="button"
                             onClick={() => dispatch(setGridRows(rows + 1))}
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </button>
-                        <p id="finalHeightLabel">{rows}</p>
+                        <p>{rows}</p>
                         <button
-                            id="finalHeightMinusButton"
                             className="button"
                             onClick={() => dispatch(setGridRows(rows - 1))}
                         >
@@ -181,23 +226,18 @@ function PauseOverlay({
                 {overlayScale < 2 && (
                     <div className="button-div">
                         <button
-                            id="regenerateButton"
                             className="button"
-                            onClick={async () => {
-                                newLevel(
+                            onClick={() =>
+                                createButton(
                                     dispatch,
                                     rows,
                                     columns,
-                                    300,
-                                    true,
-                                    setGridLoaded
-                                );
-
-                                closeOverlay(
+                                    setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible
-                                );
-                            }}
+                                    setOverlayVisible,
+                                    gameState
+                                )
+                            }
                         >
                             <FontAwesomeIcon
                                 icon={faArrowRotateRight}
@@ -212,21 +252,19 @@ function PauseOverlay({
                     overlayScale === 0 && (
                         <div className="button-div">
                             <button
-                                id="pauseSolutionButton"
                                 className="button"
-                                onClick={() => {
-                                    solveGame(
-                                        600,
+                                onClick={() =>
+                                    solveButton(
                                         dispatch,
+                                        solveGame,
                                         originalGrid,
                                         solvedGrid,
-                                        setGridLoaded
-                                    );
-                                    closeOverlay(
+                                        setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible
-                                    );
-                                }}
+                                        setOverlayVisible,
+                                        gameState
+                                    )
+                                }
                             >
                                 <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
                                 Show solution
@@ -235,17 +273,27 @@ function PauseOverlay({
                     )}
                 {gameState === GameState.Won && overlayScale === 0 && (
                     <div className="button-div">
-                        <button id="shareButton" className="button">
-                            <FontAwesomeIcon icon={faShareNodes} /> Share!
+                        <button className="button">
+                            <FontAwesomeIcon
+                                icon={faShareNodes}
+                                onClick={() =>
+                                    shareButton(rows, columns, timer, swaps)
+                                }
+                            />{" "}
+                            Share!
                         </button>
                     </div>
                 )}
                 <div className="button-div">
                     <button
-                        id="viewButton"
                         className="button"
                         onClick={() =>
-                            closeOverlay(setOverlayHiding, setOverlayVisible)
+                            closeOverlay(
+                                setOverlayHiding,
+                                setOverlayVisible,
+                                dispatch,
+                                gameState
+                            )
                         }
                     >
                         <FontAwesomeIcon icon={faRectangleXmark} size="lg" />
@@ -256,45 +304,45 @@ function PauseOverlay({
                             <button
                                 className="button"
                                 onClick={() => {
-                                    solveGame(
-                                        600,
+                                    solveButton(
                                         dispatch,
+                                        solveGame,
                                         originalGrid,
                                         solvedGrid,
-                                        setGridLoaded
-                                    );
-                                    closeOverlay(
+                                        setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible
+                                        setOverlayVisible,
+                                        gameState
                                     );
                                 }}
                             >
-                                <FontAwesomeIcon icon={faLightbulb} size="xs" />
+                                <FontAwesomeIcon icon={faLightbulb} />
                             </button>
                         )}
                     {gameState === GameState.Won && overlayScale > 1 && (
                         <button className="button">
-                            <FontAwesomeIcon icon={faShareNodes} />
+                            <FontAwesomeIcon
+                                icon={faShareNodes}
+                                onClick={() =>
+                                    shareButton(rows, columns, timer, swaps)
+                                }
+                            />
                         </button>
                     )}
                     {overlayScale === 2 && (
                         <button
                             className="button"
-                            onClick={async () => {
-                                newLevel(
+                            onClick={() =>
+                                createButton(
                                     dispatch,
                                     rows,
                                     columns,
-                                    300,
-                                    true,
-                                    setGridLoaded
-                                );
-
-                                closeOverlay(
+                                    setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible
-                                );
-                            }}
+                                    setOverlayVisible,
+                                    gameState
+                                )
+                            }
                         >
                             <FontAwesomeIcon
                                 icon={faArrowRotateRight}
@@ -303,10 +351,14 @@ function PauseOverlay({
                         </button>
                     )}
                     <button
-                        id="homeButton"
                         className="button"
                         onClick={async () => {
-                            closeOverlay(setOverlayHiding, setOverlayVisible);
+                            closeOverlay(
+                                setOverlayHiding,
+                                setOverlayVisible,
+                                dispatch,
+                                gameState
+                            );
                             setPageTransition("fade-out");
 
                             await sleep(500);

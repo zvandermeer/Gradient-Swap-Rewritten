@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
 import { GameState, incrementTimer, setGameState } from "../../gameSlice";
 import { useEffect } from "react";
+import { booleanSetterType } from "../../../../helpers";
 
 interface Props {
-    setGridLoaded: (state: boolean) => void;
-    setOverlayVisible: (state: boolean) => void;
+    setGridLoaded: booleanSetterType;
+    setOverlayVisible: booleanSetterType;
     overlayVisible: boolean;
 }
 
@@ -44,7 +45,6 @@ function GameHeader({
         <div id="controls">
             <div id="header-buttons">
                 <button
-                    id="header-menu"
                     className="button"
                     onClick={() => {
                         if (
@@ -76,7 +76,6 @@ function GameHeader({
                             );
                         }
                     }}
-                    id="header-restart"
                     className="button"
                 >
                     <FontAwesomeIcon icon={faArrowRotateRight} />
@@ -85,8 +84,8 @@ function GameHeader({
             {statsEnabled && (
                 <div id="header-stats">
                     <div>
-                        <span id="swaps">Swaps: {swaps}</span>
-                        <span id="timer">
+                        <span>Swaps: {swaps}</span>
+                        <span>
                             {Math.floor(timer / 60)}:
                             {(timer % 60).toString().padStart(2, "0")}
                         </span>
