@@ -15,7 +15,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { GameState, setGameState } from "../../gameSlice";
-import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
+import {
+    faCircleCheck,
+    faRectangleXmark,
+} from "@fortawesome/free-regular-svg-icons";
 import { AppDispatch } from "../../../../store";
 import { GridLayout, Tile } from "../Grid/Grid";
 
@@ -57,7 +60,7 @@ function createButton(
     columns: number,
     setGridLoaded: booleanSetterType,
     setOverlayHiding: booleanSetterType,
-    setOverlayVisible: booleanSetterType,
+    setOverlayVisible: booleanSetterType
 ) {
     newLevel(dispatch, rows, columns, 300, true, setGridLoaded);
 
@@ -262,8 +265,8 @@ function PauseOverlay({
                                     )
                                 }
                             >
-                                <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
-                                Show solution
+                                <FontAwesomeIcon icon={faCircleCheck} /> Show
+                                solution
                             </button>
                         </div>
                     )}
@@ -311,7 +314,7 @@ function PauseOverlay({
                                     );
                                 }}
                             >
-                                <FontAwesomeIcon icon={faLightbulb} />
+                                <FontAwesomeIcon icon={faCircleCheck} />
                             </button>
                         )}
                     {gameState === GameState.Won && overlayScale > 1 && (

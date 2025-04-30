@@ -13,7 +13,7 @@ export const gridSlice = createSlice({
             originalLayout: {} as GridLayout,
             solvedGrid: [] as Tile[],
             incorrectTiles: [] as number[],
-            visibleHints: [] as boolean[]
+            visibleHints: [] as boolean[],
         },
     },
     reducers: {
@@ -44,7 +44,7 @@ export const gridSlice = createSlice({
         },
         setVisibleHints: (state, action: PayloadAction<boolean[]>) => {
             state.value.visibleHints = action.payload;
-        }
+        },
     },
 });
 

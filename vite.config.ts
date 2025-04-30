@@ -52,7 +52,7 @@ export default defineConfig({
                 categories: ["games"],
                 dir: "ltr",
                 launch_handler: {
-                    client_mode: ["focus-existing", "auto"]
+                    client_mode: ["focus-existing", "auto"],
                 },
             },
         }),

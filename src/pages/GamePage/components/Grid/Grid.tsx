@@ -96,7 +96,7 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
         if (containerRef.current) {
             swapyRef.current = createSwapy(containerRef.current, {
                 swapMode: "drop",
-                animationDuration: 180
+                animationDuration: 180,
             });
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
@@ -179,7 +179,13 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
                                     >
                                         <div
                                             key={`tile${index}`}
-                                            className={"tile " + tileTransition + (tileHints[index] ? " hint" : "")}
+                                            className={
+                                                "tile " +
+                                                tileTransition +
+                                                (tileHints[index]
+                                                    ? " hint"
+                                                    : "")
+                                            }
                                             style={{
                                                 backgroundColor: i.tileColor,
                                                 width: tileWidth,

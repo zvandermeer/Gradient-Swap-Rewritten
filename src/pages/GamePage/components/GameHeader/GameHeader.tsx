@@ -2,7 +2,11 @@ import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import "./gameHeader.css";
 import { newLevel } from "../../generation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateRight, faBars, faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowRotateRight,
+    faBars,
+    faLightbulb,
+} from "@fortawesome/free-solid-svg-icons";
 import { GameState, incrementTimer, setGameState } from "../../gameSlice";
 import { useEffect } from "react";
 import { booleanSetterType, sleep } from "../../../../helpers";
@@ -29,8 +33,12 @@ function GameHeader({
     );
     const swaps = useAppSelector((state) => state.game.value.swaps);
     const timer = useAppSelector((state) => state.game.value.timer);
-    const incorrectTiles = useAppSelector((state) => state.grid.value.incorrectTiles);
-    const visibleHints = useAppSelector((state) => state.grid.value.visibleHints);
+    const incorrectTiles = useAppSelector(
+        (state) => state.grid.value.incorrectTiles
+    );
+    const visibleHints = useAppSelector(
+        (state) => state.grid.value.visibleHints
+    );
 
     useEffect(() => {
         const x = setInterval(function () {
@@ -86,9 +94,17 @@ function GameHeader({
                 <button
                     className="button"
                     onClick={async () => {
-                        let incorrectTile = incorrectTiles[Math.floor(Math.random() * incorrectTiles.length)];
+                        let incorrectTile =
+                            incorrectTiles[
+                                Math.floor(
+                                    Math.random() * incorrectTiles.length
+                                )
+                            ];
 
-                        let newHints: boolean[] = Object.assign([], visibleHints);
+                        let newHints: boolean[] = Object.assign(
+                            [],
+                            visibleHints
+                        );
                         newHints[incorrectTile] = true;
 
                         dispatch(setVisibleHints(newHints));

@@ -45,7 +45,13 @@
 }
 
 @keyframes hint {
-    0%   { filter: brightness(100%); }
-    50%  { filter: brightness(135%); }
-    100% { filter: brightness(100%); }
+    0% {
+        filter: brightness(100%);
+    }
+    50% {
+        filter: brightness(135%);
+    }
+    100% {
+        filter: brightness(100%);
+    }
 }
