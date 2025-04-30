@@ -1,5 +1,5 @@
-# Gradient Swap Rewritten
+# Gradient Swap
 
-An infinitely replayable, procedurally generated clone of the Colours game from [Puzzledom](https://apps.apple.com/us/app/puzzledom/id1261300725)
+🌈 A beautiful, infinitely replayable, randomly generated gradient tile swapping game, built in ReactJS.
 
-View the source code for the original game written in Vanilla Javascript [here!](https://github.com/zvandermeer/Gradient-Swap)
+Play the game [here!](https://betagradient.starlightt.xyz)

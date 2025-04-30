@@ -11,7 +11,6 @@ import {
     faArrowRotateRight,
     faShareNodes,
     faHouse,
-    faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { GameState, setGameState } from "../../gameSlice";

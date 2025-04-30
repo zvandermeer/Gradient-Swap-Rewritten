@@ -17,7 +17,7 @@ export default defineConfig({
                 short_name: "Colour Swap",
                 id: "https://betagradient.starlightt.xyz",
                 description:
-                    "An infinitely replayable, randomly generated clone of the Colours game from Puzzledom",
+                    "A beautiful, infinitely replayable, randomly generated gradient tile swapping game, built in ReactJS.",
                 start_url: "/",
                 background_color: "#fff9e7",
                 theme_color: "#fff9e7",
