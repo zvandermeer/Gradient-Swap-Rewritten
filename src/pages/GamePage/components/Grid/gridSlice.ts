@@ -12,6 +12,8 @@ export const gridSlice = createSlice({
             tileTransition: "",
             originalLayout: {} as GridLayout,
             solvedGrid: [] as Tile[],
+            incorrectTiles: [] as number[],
+            visibleHints: [] as boolean[],
         },
     },
     reducers: {
@@ -37,6 +39,12 @@ export const gridSlice = createSlice({
         setSolvedGridLayout: (state, action: PayloadAction<Tile[]>) => {
             state.value.solvedGrid = action.payload;
         },
+        setIncorrectTiles: (state, action: PayloadAction<number[]>) => {
+            state.value.incorrectTiles = action.payload;
+        },
+        setVisibleHints: (state, action: PayloadAction<boolean[]>) => {
+            state.value.visibleHints = action.payload;
+        },
     },
 });
 
@@ -47,6 +55,8 @@ export const {
     setTileTransition,
     setOriginalGridLayout,
     setSolvedGridLayout,
+    setIncorrectTiles,
+    setVisibleHints,
 } = gridSlice.actions;
 
 export const selectGrid = (state: RootState) => state.grid.value;

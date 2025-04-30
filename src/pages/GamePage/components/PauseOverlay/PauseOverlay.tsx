@@ -15,7 +15,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { GameState, setGameState } from "../../gameSlice";
-import { faRectangleXmark } from "@fortawesome/free-regular-svg-icons";
+import {
+    faCircleCheck,
+    faRectangleXmark,
+} from "@fortawesome/free-regular-svg-icons";
 import { AppDispatch } from "../../../../store";
 import { GridLayout, Tile } from "../Grid/Grid";
 
@@ -38,13 +41,13 @@ async function closeOverlay(
     setOverlayHiding: booleanSetterType,
     setOverlayVisible: booleanSetterType,
     dispatch: AppDispatch,
-    gameState: GameState
+    shouldResume: boolean
 ) {
     setOverlayHiding(true);
 
     await sleep(500);
 
-    if (gameState === GameState.Paused) {
+    if (shouldResume) {
         dispatch(setGameState(GameState.Playing));
     }
 
@@ -57,12 +60,11 @@ function createButton(
     columns: number,
     setGridLoaded: booleanSetterType,
     setOverlayHiding: booleanSetterType,
-    setOverlayVisible: booleanSetterType,
-    gameState: GameState
+    setOverlayVisible: booleanSetterType
 ) {
     newLevel(dispatch, rows, columns, 300, true, setGridLoaded);
 
-    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, false);
 }
 
 function solveButton(
@@ -72,11 +74,10 @@ function solveButton(
     solvedGrid: Tile[],
     setGridLoaded: booleanSetterType,
     setOverlayHiding: booleanSetterType,
-    setOverlayVisible: booleanSetterType,
-    gameState: GameState
+    setOverlayVisible: booleanSetterType
 ) {
     solveGame(600, dispatch, originalGrid, solvedGrid, setGridLoaded);
-    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, gameState);
+    closeOverlay(setOverlayHiding, setOverlayVisible, dispatch, false);
 }
 
 async function shareButton(
@@ -234,8 +235,7 @@ function PauseOverlay({
                                     columns,
                                     setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible,
-                                    gameState
+                                    setOverlayVisible
                                 )
                             }
                         >
@@ -261,13 +261,12 @@ function PauseOverlay({
                                         solvedGrid,
                                         setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible,
-                                        gameState
+                                        setOverlayVisible
                                     )
                                 }
                             >
-                                <FontAwesomeIcon icon={faLightbulb} size="xs" />{" "}
-                                Show solution
+                                <FontAwesomeIcon icon={faCircleCheck} /> Show
+                                solution
                             </button>
                         </div>
                     )}
@@ -292,7 +291,7 @@ function PauseOverlay({
                                 setOverlayHiding,
                                 setOverlayVisible,
                                 dispatch,
-                                gameState
+                                true
                             )
                         }
                     >
@@ -311,12 +310,11 @@ function PauseOverlay({
                                         solvedGrid,
                                         setGridLoaded,
                                         setOverlayHiding,
-                                        setOverlayVisible,
-                                        gameState
+                                        setOverlayVisible
                                     );
                                 }}
                             >
-                                <FontAwesomeIcon icon={faLightbulb} />
+                                <FontAwesomeIcon icon={faCircleCheck} />
                             </button>
                         )}
                     {gameState === GameState.Won && overlayScale > 1 && (
@@ -339,8 +337,7 @@ function PauseOverlay({
                                     columns,
                                     setGridLoaded,
                                     setOverlayHiding,
-                                    setOverlayVisible,
-                                    gameState
+                                    setOverlayVisible
                                 )
                             }
                         >
@@ -357,7 +354,7 @@ function PauseOverlay({
                                 setOverlayHiding,
                                 setOverlayVisible,
                                 dispatch,
-                                gameState
+                                false
                             );
                             setPageTransition("fade-out");
 

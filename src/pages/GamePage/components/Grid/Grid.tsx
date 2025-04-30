@@ -6,6 +6,8 @@ import { createSwapy } from "swapy";
 import "./grid.css";
 import JSConfetti from "js-confetti";
 import { GameState, incrementSwaps, setGameState } from "../../gameSlice";
+import { AppDispatch } from "../../../../store";
+import { setIncorrectTiles } from "./gridSlice";
 
 export type GridLayout = {
     rows: number;
@@ -26,16 +28,24 @@ interface Props {
 }
 
 function evaluateGrid(
+    dispatch: AppDispatch,
     solvedGridLayout: Tile[],
     internalGridLayout: String[]
 ): boolean {
+    var incorrectTiles = [];
+
     for (var i = 0; i < solvedGridLayout.length; i++) {
         if (
             !solvedGridLayout[i].fixed &&
             solvedGridLayout[i].tileColor !== internalGridLayout[i]
         ) {
-            return false;
+            incorrectTiles.push(i);
         }
+    }
+
+    if (incorrectTiles.length > 0) {
+        dispatch(setIncorrectTiles(incorrectTiles));
+        return false;
     }
 
     return true;
@@ -56,6 +66,7 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
         (state) => state.grid.value.originalLayout
     );
     const solvedGrid = useAppSelector((state) => state.grid.value.solvedGrid);
+    const tileHints = useAppSelector((state) => state.grid.value.visibleHints);
 
     const [availableScreenWidth, setAvailableScreenWidth] = useState(
         window.innerWidth - 40
@@ -85,7 +96,7 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
         if (containerRef.current) {
             swapyRef.current = createSwapy(containerRef.current, {
                 swapMode: "drop",
-                animationDuration: 180
+                animationDuration: 180,
             });
             swapyRef.current.onBeforeSwap(() => {
                 // This is for dynamically enabling and disabling swapping.
@@ -113,7 +124,7 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
                     );
                 }
 
-                if (evaluateGrid(solvedGrid, internalLayout)) {
+                if (evaluateGrid(dispatch, solvedGrid, internalLayout)) {
                     dispatch(setGameState(GameState.Won));
 
                     jsConfetti.addConfetti();
@@ -168,7 +179,13 @@ function Grid({ setOverlayVisible, gridLoaded }: Props) {
                                     >
                                         <div
                                             key={`tile${index}`}
-                                            className={"tile " + tileTransition}
+                                            className={
+                                                "tile " +
+                                                tileTransition +
+                                                (tileHints[index]
+                                                    ? " hint"
+                                                    : "")
+                                            }
                                             style={{
                                                 backgroundColor: i.tileColor,
                                                 width: tileWidth,

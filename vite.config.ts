@@ -13,14 +13,16 @@ export default defineConfig({
             },
             registerType: "autoUpdate",
             manifest: {
-                name: "Color Swap!",
-                short_name: "Color Swap!",
+                name: "Colour Swap",
+                short_name: "Colour Swap",
+                id: "https://betagradient.starlightt.xyz",
                 description:
                     "An infinitely replayable, randomly generated clone of the Colours game from Puzzledom",
                 start_url: "/",
                 background_color: "#fff9e7",
                 theme_color: "#fff9e7",
                 display: "standalone",
+                orientation: "portrait",
                 icons: [
                     {
                         src: "/icons/pwa-192x192.png",
@@ -47,6 +49,11 @@ export default defineConfig({
                         purpose: "maskable",
                     },
                 ],
+                categories: ["games"],
+                dir: "ltr",
+                launch_handler: {
+                    client_mode: ["focus-existing", "auto"],
+                },
             },
         }),
     ],

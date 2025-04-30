@@ -4,7 +4,7 @@
     width: 90%;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 650px) {
     #controls {
         width: 600px;
     }
@@ -34,25 +34,21 @@
     transform: translateY(50%);
 }
 
-@media (min-width: 600px) {
+@media (min-width: 650px) {
     #header-stats div {
         left: 60%;
     }
+    #header-stats div > span {
+        padding-left: 20px;
+    }
 }
 
-@media (max-width: 599px) {
+@media (max-width: 649px) {
     #header-stats div {
         right: 0%;
         bottom: 50%;
         width: 8ch;
     }
-}
-@media (min-width: 600px) {
-    #header-stats div > span {
-        padding-left: 20px;
-    }
-}
-@media (max-width: 599px) {
     #header-stats div > span {
         display: block;
     }
