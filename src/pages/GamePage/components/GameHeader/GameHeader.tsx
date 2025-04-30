@@ -2,10 +2,11 @@ import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import "./gameHeader.css";
 import { newLevel } from "../../generation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateRight, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateRight, faBars, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { GameState, incrementTimer, setGameState } from "../../gameSlice";
 import { useEffect } from "react";
-import { booleanSetterType } from "../../../../helpers";
+import { booleanSetterType, sleep } from "../../../../helpers";
+import { setVisibleHints } from "../Grid/gridSlice";
 
 interface Props {
     setGridLoaded: booleanSetterType;
@@ -28,6 +29,8 @@ function GameHeader({
     );
     const swaps = useAppSelector((state) => state.game.value.swaps);
     const timer = useAppSelector((state) => state.game.value.timer);
+    const incorrectTiles = useAppSelector((state) => state.grid.value.incorrectTiles);
+    const visibleHints = useAppSelector((state) => state.grid.value.visibleHints);
 
     useEffect(() => {
         const x = setInterval(function () {
@@ -79,6 +82,26 @@ function GameHeader({
                     className="button"
                 >
                     <FontAwesomeIcon icon={faArrowRotateRight} />
+                </button>
+                <button
+                    className="button"
+                    onClick={async () => {
+                        let incorrectTile = incorrectTiles[Math.floor(Math.random() * incorrectTiles.length)];
+
+                        let newHints: boolean[] = Object.assign([], visibleHints);
+                        newHints[incorrectTile] = true;
+
+                        dispatch(setVisibleHints(newHints));
+
+                        await sleep(3000);
+
+                        newHints = Object.assign([], visibleHints);
+                        newHints[incorrectTile] = false;
+
+                        dispatch(setVisibleHints(newHints));
+                    }}
+                >
+                    <FontAwesomeIcon icon={faLightbulb} />
                 </button>
             </div>
             {statsEnabled && (

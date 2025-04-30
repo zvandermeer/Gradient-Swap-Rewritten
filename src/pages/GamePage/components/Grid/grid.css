@@ -38,3 +38,14 @@
     border-radius: 50%;
     position: absolute;
 }
+
+.hint {
+    animation: hint 1s ease-in-out 3;
+    animation-fill-mode: forwards;
+}
+
+@keyframes hint {
+    0%   { filter: brightness(100%); }
+    50%  { filter: brightness(135%); }
+    100% { filter: brightness(100%); }
+}
